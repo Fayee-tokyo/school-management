@@ -8,82 +8,103 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using SchoolManagementAPI.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-        )
+    c.SwaggerDoc("v1", new() { Title = "SchoolManagementAPI", Version = "v1" });
 
-    };
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by your token. Example: Bearer abc123"
+    });
+
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
+
+
+builder.Services.AddControllers();
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.AddIdentity<ApplicationUser , IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+
+// Validate JWT Key
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("JWT Key is missing in appsettings.json");
+}
+
+
+// Configure JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidateLifetime = true, // Ensure tokens expire
+            ClockSkew = TimeSpan.Zero // Strict expiration validation
+        };
+    });
+
+
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
 
+var app = builder.Build();
 
-var app =builder.Build();
+// Seed Roles
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await SchoolManagementAPI.Helpers.RoleSeeder.SeedRolesAsync(roleManager);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
+app.UseAuthentication(); // Ensure this is before UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
-
-app.MapGet("/weatherforecast", () =>
-{
-
-    var summaries = new[]
-    {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast(
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-});
-
 app.Run();
-
-internal class WeatherForecast
-{
-    private DateOnly dateOnly;
-    private int v1;
-    private string v2;
-
-    public WeatherForecast(DateOnly dateOnly, int v1, string v2)
-    {
-        this.dateOnly = dateOnly;
-        this.v1 = v1;
-        this.v2 = v2;
-    }
-}
-
 
