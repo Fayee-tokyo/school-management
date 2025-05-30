@@ -44,4 +44,14 @@ public class TokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    internal async Task GenerateJwtToken(ApplicationUser user)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task GenerateJwtToken(ClaimsPrincipal user)
+    {
+        throw new NotImplementedException();
+    }
 }
