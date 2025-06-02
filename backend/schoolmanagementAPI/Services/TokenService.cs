@@ -1,57 +1,48 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using SchoolManagementAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using SchoolManagementAPI.Models; // Replace with your project’s namespace
 
-namespace SchoolManagementAPI.Services; // Replace with your namespace
-
-public class TokenService
+namespace SchoolManagementAPI.Services
 {
-    private readonly IConfiguration _config;
-
-    public TokenService(IConfiguration config)
+    public class TokenService
     {
-        _config = config;
-    }
+        private readonly IConfiguration _config;
 
-    public string CreateToken(ApplicationUser user)
-    {
-        // Ensure user properties are not null
-        var claims = new List<Claim>
+        public TokenService(IConfiguration config)
         {
-            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
-        };
+            _config = config;
+        }
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
-        );
+        public string GenerateJwtToken(ApplicationUser user, IList<string> roles)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
 
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
-        var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(
-                double.Parse(_config["Jwt:ExpireMinutes"]!)
-            ),
-            signingCredentials: creds
-        );
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2),
+                signingCredentials: creds
+            );
 
-    internal async Task GenerateJwtToken(ApplicationUser user)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task GenerateJwtToken(ClaimsPrincipal user)
-    {
-        throw new NotImplementedException();
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

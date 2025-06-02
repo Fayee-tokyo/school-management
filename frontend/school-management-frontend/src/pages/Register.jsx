@@ -8,7 +8,6 @@ export default function Register() {
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
-    username: '',
     phone: '',
     email: '',
     password: '',
@@ -98,16 +97,6 @@ export default function Register() {
         className={styles.inputField}
       />
       {errors.lastName && <p className={styles.errorText}>{errors.lastName}</p>}
-
-      <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        value={form.username}
-        onChange={handleChange}
-        className={styles.inputField}
-      />
-      {errors.username && <p className={styles.errorText}>{errors.username}</p>}
 
       <input
         type="text"
