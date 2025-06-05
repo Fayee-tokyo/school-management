@@ -1,54 +1,77 @@
 .formContainer {
-  max-width: 400px;
-  margin: 3rem auto;
+  display: flex;
+  justify-content: center;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  align-items: center;
+}
+
+.formBox {
+  background-color: #ffffff;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+}
+
+.heading {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.formContainer h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
+.rowGroup {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.inputField,
-.selectField {
-  width: 100%;
-  padding: 0.75rem;
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   margin-bottom: 1rem;
+}
+
+.inputField {
+  padding: 0.75rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition: border 0.2s ease-in-out;
+  transition: border 0.3s ease;
 }
 
-.inputField:focus,
-.selectField:focus {
+.inputField:focus {
   border-color: #007bff;
   outline: none;
 }
 
+.error {
+  border-color: #ff4d4d;
+}
+
 .errorText {
-  color: red;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  color: #ff4d4d;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
 }
 
 .submitButton {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1rem;
   background-color: #007bff;
   color: #fff;
+  font-size: 1.125rem;
+  font-weight: bold;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
 }
 
 .submitButton:hover {
@@ -59,13 +82,4 @@
   margin-top: 1rem;
   text-align: center;
   font-size: 0.95rem;
-}
-
-.loginLink a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.loginLink a:hover {
-  text-decoration: underline;
 }

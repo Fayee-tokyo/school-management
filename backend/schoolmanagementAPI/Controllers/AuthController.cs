@@ -30,11 +30,31 @@ namespace SchoolManagementAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existingUser != null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { Message = "User already exists." });
+                //return validation errors back to client
+                return BadRequest(ModelState);
             }
+
+             // Role validation
+    switch (request.Role?.ToLower())
+    {
+        case "student":
+            if (string.IsNullOrWhiteSpace(request.RegistrationNumber) || request.RegistrationNumber != "VALID-STUDENT-001")
+                return BadRequest("Invalid or missing registration number for student.");
+            break;
+        case "teacher":
+        case "admin":
+            if (string.IsNullOrWhiteSpace(request.StaffId) || request.StaffId != "VALID-STAFF-001")
+                return BadRequest("Invalid or missing staff ID for teacher/admin.");
+            break;
+        case "parent":
+            if (string.IsNullOrWhiteSpace(request.ParentCode) || request.ParentCode != "VALID-PARENT-001")
+                return BadRequest("Invalid or missing parent code.");
+            break;
+        default:
+            return BadRequest("Invalid role specified.");
+    }
 
             var user = new ApplicationUser
             {

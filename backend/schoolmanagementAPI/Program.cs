@@ -56,6 +56,15 @@ builder.Services.AddIdentity<ApplicationUser , IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+    policy => policy
+    .AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod());
+});
+
 
 // Validate JWT Key
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -102,7 +111,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();//
+app.UseCors("AllowFrontend");
 app.UseAuthentication(); // Ensure this is before UseAuthorization
 app.UseAuthorization();
 app.MapControllers();

@@ -1,43 +1,86 @@
 import { useState } from 'react';
 import axios from 'axios';
-import './Login.module.css'; //import the styles
+import './Login.module.css'; // Import styles
+import {jwtDecode} from 'jwt-decode'; // ✅ Correct import spelling
 
-const Login =() =>{
-  const [formData,setFormData] =useState({ email:",password:"});
+const Login = () => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
 
-  const handleChange =e=>{
-    setFormData({ ...formData,[e.target.name]: e.target.value});
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError('');
   };
-  
-  const handleSubmit=async e=>{
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      const response = await
-      axios.post('http://localhost:5000/api/auth/login',formData);
-      const{token} =response.data;
-      //Store the JWT token in localStorage
-      localStorage.setItem('token',token);
+    try {
+      const response = await axios.post('http://localhost:5293/api/auth/login', formData);
+      const { token } = response.data;
 
-      console.log('Login successful:',response.data);
-      //save token to localStorage or redirect
+      if (!token) throw new Error('Token not found in response');
 
-      //Optional:Redirect to a protected route (like dashboard)
+      // Store token
+      localStorage.setItem('token', token);
 
-      window.location.href='/dashboard';
-    } catch (error){
-      console.error('Login failed:',error.response?.data||error.message);
+      // Decode the JWT token
+      const decoded = jwtDecode(token);
+      console.log('Decoded JWT payload:', decoded);
+
+      // Extract the role
+      let role = null;
+
+      if (Array.isArray(decoded.role)) {
+        role = decoded.role[0];
+      } else if (decoded.role) {
+        role = decoded.role;
+      } else {
+        const claimUri = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+        const claimVal = decoded[claimUri];
+        if (Array.isArray(claimVal)) {
+          role = claimVal[0];
+        } else {
+          role = claimVal;
+        }
+      }
+
+      console.log('Extracted role:', role);
+
+      // Redirect based on role
+      switch (role) {
+        case 'Admin':
+          window.location.href = '/admin/dashboard';
+          break;
+        case 'Teacher':
+          window.location.href = '/teacher/dashboard';
+          break;
+        case 'Student':
+          window.location.href = '/student/dashboard';
+          break;
+        case 'Parent':
+          window.location.href = '/parent/dashboard';
+          break;
+        default:
+          window.location.href = '/unauthorized';
+      }
+
+    } catch (error) {
+      console.error('Login failed:', error.response?.data || error.message);
+      setError('Login failed. Please check your credentials.');
     }
   };
-  return(
+
+  return (
     <div className="login-container">
-    <form on Submit ={handleSubmit}>
-      <h2>Login</h2>
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} required/>
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} required/>
-      <button type ="submit">Login</button>
-    </form>
+      <form onSubmit={handleSubmit}>
+        <h2>Login</h2>
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+        <button type="submit">Login</button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+      </form>
     </div>
   );
 };
-export default Login;
 
+export default Login;
