@@ -1,16 +1,15 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminDashboard from './components/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-
-
+import AdminPage from  './pages/AdminPage';
 function App() {
   return (
     <>
@@ -21,6 +20,17 @@ function App() {
         <Route path="/register" element={<Register/>} />
         <Route path ="/login" element ={<Login />} />
         <Route path ="/unauthorized" element={<unauthorized/>}/>
+        <Route path="/admin" element={<AdminPage/>}/>
+// In App.jsx or Routes.jsx
+<Route
+  path="/admin-dashboard"
+  element={
+    localStorage.getItem('token')
+      ? <AdminDashboard />
+      : <Navigate to="/login" />
+  }
+/>
+
 
         {/*Admin only*/}
         <Route

@@ -76,9 +76,10 @@ export default function Register() {
       email: form.email,
       password: form.password,
       role: form.role,
-      adminCode: form.adminCode || null,
-      teacherId: form.teacherId || null,
-      registrationNumber: form.registrationNumber || null,
+      registrationNumber: form.role === 'Student' ? form.registrationNumber : null,
+      staffId:
+      form.role==='Teacher'? form.teacherId:
+      form.role ==='Admin'? form.adminCode:null,
       parentCode: form.parentCode || null,
     };
 

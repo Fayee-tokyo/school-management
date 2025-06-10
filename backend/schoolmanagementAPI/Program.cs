@@ -7,6 +7,7 @@ using SchoolManagementAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using SchoolManagementAPI.Services;
+using System.Reflection.Metadata.Ecma335;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -90,6 +91,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero // Strict expiration validation
         };
     });
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = 403;
+        return Task.CompletedTask;
+    };
+});
 
 
 builder.Services.AddAuthorization();

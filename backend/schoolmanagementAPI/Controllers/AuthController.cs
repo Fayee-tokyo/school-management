@@ -16,15 +16,18 @@ namespace SchoolManagementAPI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly TokenService _tokenService;
+        private readonly IConfiguration _configuration;
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            TokenService tokenService)
+            TokenService tokenService,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _configuration = configuration; 
         }
 
         [HttpPost("register")]
@@ -32,8 +35,14 @@ namespace SchoolManagementAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                //return validation errors back to client
-                return BadRequest(ModelState);
+                var errors = ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        return BadRequest(new { Message = "Validation failed", Errors = errors });
             }
 
              // Role validation
@@ -45,8 +54,9 @@ namespace SchoolManagementAPI.Controllers
             break;
         case "teacher":
         case "admin":
+                    var staffCode = _configuration["RegistrationCodes :Admin"];
             if (string.IsNullOrWhiteSpace(request.StaffId) || request.StaffId != "VALID-STAFF-001")
-                return BadRequest("Invalid or missing staff ID for teacher/admin.");
+                        return BadRequest("Invalid or missing staff ID for teacher/admin.");
             break;
         case "parent":
             if (string.IsNullOrWhiteSpace(request.ParentCode) || request.ParentCode != "VALID-PARENT-001")
