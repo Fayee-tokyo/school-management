@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
-import Navigationbar from './components/Navigationbar';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
@@ -15,7 +14,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
   return (
     <>
-      <Navigationbar />
       <main style={{minHeight: '80vh',padding: '2rem'}}>
       <Routes>
         <Route path="/" element={<Home />} />
