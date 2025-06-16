@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagementAPI.Data;
 
@@ -11,9 +12,11 @@ using SchoolManagementAPI.Data;
 namespace schoolmanagementAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250616060454_AddGradesAndCourses")]
+    partial class AddGradesAndCourses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,35 +25,7 @@ namespace schoolmanagementAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Attendance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Present")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TeacherStaffId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("Attendances");
-                });
-
-            modelBuilder.Entity("CoursesStudent", b =>
+            modelBuilder.Entity("CourseStudent", b =>
                 {
                     b.Property<int>("CoursesId")
                         .HasColumnType("int");
@@ -62,7 +37,7 @@ namespace schoolmanagementAPI.Migrations
 
                     b.HasIndex("StudentsId");
 
-                    b.ToTable("CoursesStudent");
+                    b.ToTable("CourseStudent");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -278,7 +253,7 @@ namespace schoolmanagementAPI.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("SchoolManagementAPI.Models.Courses", b =>
+            modelBuilder.Entity("SchoolManagementAPI.Models.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -286,36 +261,13 @@ namespace schoolmanagementAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("StaffId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TeacherId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
-
                     b.ToTable("Courses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            StaffId = "TCH001",
-                            Title = "Math"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            StaffId = "TCH002",
-                            Title = "English"
-                        });
                 });
 
             modelBuilder.Entity("SchoolManagementAPI.Models.Grade", b =>
@@ -328,10 +280,6 @@ namespace schoolmanagementAPI.Migrations
 
                     b.Property<double>("Score")
                         .HasColumnType("float");
-
-                    b.Property<string>("StaffId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
@@ -347,38 +295,6 @@ namespace schoolmanagementAPI.Migrations
                     b.ToTable("Grades");
                 });
 
-            modelBuilder.Entity("SchoolManagementAPI.Models.StudentCourse", b =>
-                {
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("StudentId", "CourseId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("StudentCourse");
-
-                    b.HasData(
-                        new
-                        {
-                            StudentId = 1,
-                            CourseId = 1
-                        },
-                        new
-                        {
-                            StudentId = 2,
-                            CourseId = 1
-                        },
-                        new
-                        {
-                            StudentId = 3,
-                            CourseId = 2
-                        });
-                });
-
             modelBuilder.Entity("Student", b =>
                 {
                     b.Property<int>("Id")
@@ -388,9 +304,10 @@ namespace schoolmanagementAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Class")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DateOfBirth")
+                    b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FullName")
@@ -402,31 +319,12 @@ namespace schoolmanagementAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Students");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FullName = "Alice Johnson",
-                            RegistrationNumber = "STU001"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FullName = "Bob Green",
-                            RegistrationNumber = "STU002"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FullName = "Clara White",
-                            RegistrationNumber = "STU003"
-                        });
                 });
 
             modelBuilder.Entity("Teacher", b =>
@@ -438,6 +336,7 @@ namespace schoolmanagementAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
@@ -455,38 +354,11 @@ namespace schoolmanagementAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teachers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FullName = "John Doe",
-                            StaffId = "ST001",
-                            Subject = "Computer Science"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FullName = "Jane Smith",
-                            StaffId = "St002",
-                            Subject = "Mathematics"
-                        });
                 });
 
-            modelBuilder.Entity("Attendance", b =>
+            modelBuilder.Entity("CourseStudent", b =>
                 {
-                    b.HasOne("Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("CoursesStudent", b =>
-                {
-                    b.HasOne("SchoolManagementAPI.Models.Courses", null)
+                    b.HasOne("SchoolManagementAPI.Models.Course", null)
                         .WithMany()
                         .HasForeignKey("CoursesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -550,13 +422,6 @@ namespace schoolmanagementAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SchoolManagementAPI.Models.Courses", b =>
-                {
-                    b.HasOne("Teacher", null)
-                        .WithMany("Courses")
-                        .HasForeignKey("TeacherId");
-                });
-
             modelBuilder.Entity("SchoolManagementAPI.Models.Grade", b =>
                 {
                     b.HasOne("Student", "Student")
@@ -568,33 +433,9 @@ namespace schoolmanagementAPI.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("SchoolManagementAPI.Models.StudentCourse", b =>
-                {
-                    b.HasOne("SchoolManagementAPI.Models.Courses", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("Student", b =>
                 {
                     b.Navigation("Grades");
-                });
-
-            modelBuilder.Entity("Teacher", b =>
-                {
-                    b.Navigation("Courses");
                 });
 #pragma warning restore 612, 618
         }

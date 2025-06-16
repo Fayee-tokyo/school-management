@@ -1,5 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagementAPI.Data; // Ensure this namespace contains ApplicationDbContext
+using SchoolManagementAPI.Models;
+using System.Security.Claims;
 
 namespace SchoolManagementAPI.Controllers;
 
@@ -8,26 +13,58 @@ namespace SchoolManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class StudentController : ControllerBase
 {
-    // View own profile
+    // Make sure ApplicationDbContext is defined in SchoolManagementAPI.Data namespace
+    private readonly AppDbContext _context;
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public StudentController(AppDbContext context, UserManager<IdentityUser> userManager)
+    {
+        _context = context;
+        _userManager = userManager;
+    }
+
+    // GET: api/student/profile
     [HttpGet("profile")]
-    public IActionResult GetProfile()
+    public async Task<IActionResult> GetProfile()
     {
-        // Logic to return student info based on User.Identity.Name
-        return Ok("Student profile info");
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+
+        if (student == null)
+            return NotFound("Student profile not found.");
+
+        return Ok(student);
     }
 
-    // View grades
+    // GET: api/student/grades
     [HttpGet("grades")]
-    public IActionResult GetGrades()
+    public async Task<IActionResult> GetGrades()
     {
-        // Logic to return grades
-        return Ok("Student grades");
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var student = await _context.Students
+            .Include(s => s.Grades)
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+
+        if (student == null)
+            return NotFound("Student not found.");
+
+        return Ok(student.Grades);
     }
 
-    // View courses
+    // GET: api/student/courses
     [HttpGet("courses")]
-    public IActionResult GetCourses()
+    public async Task<IActionResult> GetCourses()
     {
-        return Ok("Enrolled courses");
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var student = await _context.Students
+            .Include(s => s.Courses)
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+
+        if (student == null)
+            return NotFound("Student not found.");
+
+        return Ok(student.Courses);
     }
+
+    // Removed the private ApplicationDbContext class to resolve accessibility issues.
 }

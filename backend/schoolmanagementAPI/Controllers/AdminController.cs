@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagementAPI.Data;
 using SchoolManagementAPI.Models;
 
 namespace SchoolManagementAPI.Controllers
@@ -11,10 +13,12 @@ namespace SchoolManagementAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _context;
 
-        public AdminController(UserManager<ApplicationUser> userManager)
+        public AdminController(UserManager<ApplicationUser> userManager, AppDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         // Get all users and their roles
@@ -94,6 +98,27 @@ namespace SchoolManagementAPI.Controllers
                 return BadRequest(addResult.Errors);
 
             return Ok(new { message = $"User role updated to {newRole}." });
+        }
+
+        // ✅ Add Teacher
+        [HttpPost("add-teacher")]
+        public async Task<IActionResult> AddTeacher([FromBody] Teacher teacher)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _context.Teachers.Add(teacher);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Teacher added successfully." });
+        }
+
+        // ✅ Get All Teachers
+        [HttpGet("teachers")]
+        public IActionResult GetTeachers()
+        {
+            var teachers = _context.Teachers.ToList();
+            return Ok(teachers);
         }
     }
 }

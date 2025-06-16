@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
-import './Login.module.css'; // Import styles
-import {jwtDecode} from 'jwt-decode'; // ✅ Correct import spelling
+import { jwtDecode } from 'jwt-decode'; 
+import './Login.module.css'; 
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -27,7 +27,7 @@ const Login = () => {
       const decoded = jwtDecode(token);
       console.log('Decoded JWT payload:', decoded);
 
-      // Extract the role
+      // Extract the role from standard claim or custom one
       let role = null;
 
       if (Array.isArray(decoded.role)) {
@@ -37,13 +37,13 @@ const Login = () => {
       } else {
         const claimUri = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
         const claimVal = decoded[claimUri];
-        if (Array.isArray(claimVal)) {
-          role = claimVal[0];
-        } else {
-          role = claimVal;
-        }
+        role = Array.isArray(claimVal) ? claimVal[0] : claimVal;
       }
 
+      if (!role) throw new Error('Role not found in token');
+
+      // Store role
+      localStorage.setItem('role', role);
       console.log('Extracted role:', role);
 
       // Redirect based on role
@@ -74,8 +74,22 @@ const Login = () => {
     <div className="login-container">
       <form onSubmit={handleSubmit}>
         <h2>Login</h2>
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
         <button type="submit">Login</button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
@@ -84,3 +98,4 @@ const Login = () => {
 };
 
 export default Login;
+
