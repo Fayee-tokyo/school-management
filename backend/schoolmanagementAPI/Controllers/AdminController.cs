@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagementAPI.Data;
+using SchoolManagementAPI.DTOs.Teacher;
 using SchoolManagementAPI.Models;
 
 namespace SchoolManagementAPI.Controllers
@@ -14,6 +15,7 @@ namespace SchoolManagementAPI.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _context;
+        private Teacher teacher;
 
         public AdminController(UserManager<ApplicationUser> userManager, AppDbContext context)
         {
@@ -102,10 +104,12 @@ namespace SchoolManagementAPI.Controllers
 
         // ✅ Add Teacher
         [HttpPost("add-teacher")]
-        public async Task<IActionResult> AddTeacher([FromBody] Teacher teacher)
+        public async Task<IActionResult> AddTeacher([FromBody] CreateTeacherDto dto)
+        
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            
 
             _context.Teachers.Add(teacher);
             await _context.SaveChangesAsync();
@@ -120,5 +124,8 @@ namespace SchoolManagementAPI.Controllers
             var teachers = _context.Teachers.ToList();
             return Ok(teachers);
         }
-    }
-}
+        
+        }
+ }
+
+

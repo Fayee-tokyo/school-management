@@ -9,6 +9,6 @@ namespace SchoolManagementAPI.Models
         // Foreign Key to Student
         public int StudentId { get; set; }
         public Student Student { get; set; }
-        public string StaffId { get; set; }
+        public string TeacherId { get; set; }
     }
 }

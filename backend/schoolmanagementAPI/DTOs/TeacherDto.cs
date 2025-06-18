@@ -1,18 +1,14 @@
-namespace SchoolManagementAPI.Models
+namespace SchoolManagementAPI.DTOs.Teacher
 {
-    public class Teacher
+    public class TeacherDto
     {
-        public int Id { get; set; } // Primary Key
-
+        public int Id { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string Gender { get; set; }
         public string Faculty { get; set; }
         public string Department { get; set; }
-
-        // This will link to the Identity User table
         public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
     }
 }

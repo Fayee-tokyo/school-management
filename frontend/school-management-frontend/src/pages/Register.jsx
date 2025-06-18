@@ -15,10 +15,7 @@ export default function Register() {
     password: '',
     confirmPassword: '',
     role: 'Student',
-    adminCode: '',
-    teacherId: '',
-    registrationNumber: '',
-    parentCode: '',
+  
   });
 
   const [errors, setErrors] = useState({});
@@ -39,7 +36,7 @@ export default function Register() {
 
   const validate = () => {
     const newErrors = {};
-    const { firstName, lastName, phone, email, password, confirmPassword, role } = form;
+    const { firstName, lastName, phone, email, password, confirmPassword } = form;
 
     if (!firstName.trim()) newErrors.firstName = 'First name is required';
     if (!lastName.trim()) newErrors.lastName = 'Last name is required';
@@ -50,12 +47,7 @@ export default function Register() {
     else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (confirmPassword !== password) newErrors.confirmPassword = 'Passwords do not match';
 
-    // Role-specific validation
-    if (role === 'Admin' && !form.adminCode.trim()) newErrors.adminCode = 'Admin code is required';
-    if (role === 'Teacher' && !form.teacherId.trim()) newErrors.teacherId = 'Teacher ID is required';
-    if (role === 'Student' && !form.registrationNumber.trim()) newErrors.registrationNumber = 'Registration number is required';
-    if (role === 'Parent' && !form.parentCode.trim()) newErrors.parentCode = 'Parent code is required';
-
+    
     return newErrors;
   };
 
@@ -76,11 +68,7 @@ export default function Register() {
       email: form.email,
       password: form.password,
       role: form.role,
-      registrationNumber: form.role === 'Student' ? form.registrationNumber : null,
-      staffId:
-      form.role==='Teacher'? form.teacherId:
-      form.role ==='Admin'? form.adminCode:null,
-      parentCode: form.parentCode || null,
+      
     };
 
     try {
@@ -154,31 +142,7 @@ export default function Register() {
             <option value="Admin">Admin</option>
           </select>
         </div>
-
-        {form.role === 'Admin' && (
-          <div className={styles.formGroup}>
-            <input type="text" name="adminCode" placeholder="Admin Code" value={form.adminCode} onChange={handleChange} className={styles.inputField} />
-            {errors.adminCode && <p className={styles.errorText}>{errors.adminCode}</p>}
-          </div>
-        )}
-        {form.role === 'Teacher' && (
-          <div className={styles.formGroup}>
-            <input type="text" name="teacherId" placeholder="Teacher ID" value={form.teacherId} onChange={handleChange} className={styles.inputField} />
-            {errors.teacherId && <p className={styles.errorText}>{errors.teacherId}</p>}
-          </div>
-        )}
-        {form.role === 'Student' && (
-          <div className={styles.formGroup}>
-            <input type="text" name="registrationNumber" placeholder="Registration Number" value={form.registrationNumber} onChange={handleChange} className={styles.inputField} />
-            {errors.registrationNumber && <p className={styles.errorText}>{errors.registrationNumber}</p>}
-          </div>
-        )}
-        {form.role === 'Parent' && (
-          <div className={styles.formGroup}>
-            <input type="text" name="parentCode" placeholder="Parent Code" value={form.parentCode} onChange={handleChange} className={styles.inputField} />
-            {errors.parentCode && <p className={styles.errorText}>{errors.parentCode}</p>}
-          </div>
-        )}
+        
 
         <button type="submit" className={styles.submitButton} disabled={submitting}>
           {submitting ? 'Creating Account...' : 'Register'}

@@ -13,38 +13,72 @@ namespace SchoolManagementAPI.Data
         public DbSet<Courses> Courses { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<StudentCourse> StudentCourses { get; set; }
 
-        // Add other DbSets (Student, Teacher, etc.) here
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            //Teachers
-            modelBuilder.Entity<Teacher>().HasData(
-                new Teacher { Id = 1, FullName = "John Doe", StaffId = "ST001", Subject = "Computer Science" },
-                new Teacher { Id = 2, FullName = "Jane Smith", StaffId = "St002", Subject = "Mathematics" }
 
-            );
+            //  Configure composite primary key for StudentCourse
+            modelBuilder.Entity<StudentCourse>()
+               .HasKey(sc => new { sc.StudentId, sc.CourseId });
+
+            modelBuilder.Entity<StudentCourse>()
+                .HasOne(sc => sc.Student)
+                .WithMany(s => s.StudentCourses)
+                .HasForeignKey(sc => sc.StudentId);
+
+            modelBuilder.Entity<StudentCourse>()
+                .HasOne(sc => sc.Course)
+                .WithMany(c => c.StudentCourses)
+                .HasForeignKey(sc => sc.CourseId);
+
+            // ✅ Sample Seed Data
+
             modelBuilder.Entity<Student>().HasData(
-                new Student { Id = 1, FullName = "Alice Johnson", RegistrationNumber = "STU001", },
-                new Student { Id = 2, FullName = "Bob Green", RegistrationNumber = "STU002" },
-                new Student { Id = 3, FullName = "Clara White", RegistrationNumber = "STU003" }
+                new Student
+                {
+                    Id = 1,
+                    FullName = "Alice Johnson",
+                    RegistrationNumber = "STU001",
+                    Class = "First Year"
+                }
             );
 
-            // Courses
             modelBuilder.Entity<Courses>().HasData(
-                new Courses { Id = 1, Title = "Math", StaffId = "TCH001" },
-                new Courses { Id = 2, Title = "English", StaffId = "TCH002" }
+                new Courses
+                {
+                    Id = 1,
+                    Title = "Computer Science 101",
+                    TeacherId = "1" // Make sure a user with Id "1" exists in ASP.NET Identity
+                }
             );
 
-            // If you're using StudentCourse (many-to-many)
-            modelBuilder.Entity<StudentCourse>().HasKey(sc => new { sc.StudentId, sc.CourseId });
-            modelBuilder.Entity<StudentCourse>().HasData(
-                new { StudentId = 1, CourseId = 1 },
-                new { StudentId = 2, CourseId = 1 },
-                new { StudentId = 3, CourseId = 2 }
-            );
+            // modelBuilder.Entity<StudentCourse>().HasData(
+            // new StudentCourse
+            {
+                //     StudentId = 1,
+                // CourseId = 1
+                // }
+                //  );
+
+                // Optional: seed teacher (uncomment if needed and a UserId "1" exists)
+                /*
+                modelBuilder.Entity<Teacher>().HasData(
+                    new Teacher
+                    {
+                        Id = 1,
+                        FullName = "John Doe",
+                        Email = "johndoe@example.com",
+                        PhoneNumber = "0700000000",
+                        Gender = "Male",
+                        Faculty = "Engineering",
+                        Department = "Computer Science",
+                        UserId = "1"
+                    }
+                );
+                */
+            }
         }
     }
 }
-
-            

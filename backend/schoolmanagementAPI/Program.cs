@@ -7,22 +7,26 @@ using SchoolManagementAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using SchoolManagementAPI.Services;
+using System.Security.Claims;
+using SchoolManagementAPI.Helpers;
 
-// ✅ Ensure correct appsettings loading
+// Ensure correct appsettings loading
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Load both base and environment-specific config (Development, Production, etc.)
+// Load both base and environment-specific config (Development, Production, etc.)
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-// ✅ Add services to the container.
+//  Add services to the container.
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+.AddRoles<IdentityRole>()
+
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -36,14 +40,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ✅ Validate JWT Key
+// Validate JWT Key
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKey))
 {
     throw new InvalidOperationException("JWT Key is missing in configuration");
 }
 
-// ✅ Configure JWT Authentication
+// Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -59,11 +63,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
 
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            RoleClaimType= ClaimTypes.Role ,//ensure roles are included in claims
         };
     });
 
-// ✅ Custom response for unauthorized/forbidden
+//  Custom response for unauthorized/forbidden
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
@@ -81,7 +86,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
 
-// ✅ Swagger with JWT support
+//  Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -115,15 +120,19 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ✅ Seed roles and default admin
+/*//  Seed roles and default admin
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    
 
     await SchoolManagementAPI.Helpers.RoleSeeder.SeedRolesAsync(roleManager);
     await SchoolManagementAPI.Helpers.AdminSeeder.SeedAdminAsync(userManager, roleManager);
+    await TeacherSeeder.SeedTeachersAsync(userManager, roleManager, context); //  Add this line
 }
+*/
 
 // ✅ Middleware pipeline
 if (app.Environment.IsDevelopment())

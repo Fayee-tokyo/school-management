@@ -18,7 +18,7 @@ namespace SchoolManagementAPI.Helpers
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    FirstName = "System",
+                    FirstName = "System", 
                     LastName = "Admin",
                     PhoneNumber = "0700000000",
                     EmailConfirmed = true

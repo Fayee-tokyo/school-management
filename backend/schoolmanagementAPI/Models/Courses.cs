@@ -10,7 +10,8 @@ namespace SchoolManagementAPI.Models
 
         // Many-to-Many with Students
         public ICollection<Student> Students { get; set; }
-        public string StaffId{ get; set; }
+        public ICollection<StudentCourse> StudentCourses{get; set;}
+        public string TeacherId { get; set; }
     
     }
 }

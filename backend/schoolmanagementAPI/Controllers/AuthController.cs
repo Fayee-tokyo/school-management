@@ -46,25 +46,7 @@ namespace SchoolManagementAPI.Controllers
             }
 
              // Role validation
-    switch (request.Role?.ToLower())
-    {
-        case "student":
-            if (string.IsNullOrWhiteSpace(request.RegistrationNumber) || request.RegistrationNumber != "VALID-STUDENT-001")
-                return BadRequest("Invalid or missing registration number for student.");
-            break;
-        case "teacher":
-        case "admin":
-                    var staffCode = _configuration["RegistrationCodes :Admin"];
-            if (string.IsNullOrWhiteSpace(request.StaffId) || request.StaffId != "VALID-STAFF-001")
-                        return BadRequest("Invalid or missing staff ID for teacher/admin.");
-            break;
-        case "parent":
-            if (string.IsNullOrWhiteSpace(request.ParentCode) || request.ParentCode != "VALID-PARENT-001")
-                return BadRequest("Invalid or missing parent code.");
-            break;
-        default:
-            return BadRequest("Invalid role specified.");
-    }
+  
 
             var user = new ApplicationUser
             {

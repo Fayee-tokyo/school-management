@@ -5,10 +5,12 @@ namespace SchoolManagementAPI.Models
     public class ApplicationUser : IdentityUser
     {
         public string? FirstName { get; set; }
-        public string? LastName { get; set; } 
-        public string? RegistrationNumber { get; set; } // For Students
-    public string? StaffId { get; set; }             // For Teachers
-    public string? ParentCode { get; set; }          // For Parents
+        public string? LastName { get; set; }
+        public string? Gender { get; set; }
+        public string? RegistrationNumber { get; set; } // For Students            // For Teachers
+        public string? ParentCode { get; set; }   
+    
+    public Teacher? TeacherProfile{ get; set; }       // For teachers
 
     }
 }

@@ -25,12 +25,12 @@ namespace SchoolManagementAPI.Controllers
         [HttpGet("students")]
         public async Task<IActionResult> GetStudents()
         {
-            var staffId = User.FindFirst("staffId")?.Value;
-            if (string.IsNullOrEmpty(staffId))
-                return Unauthorized("Staff ID not found in token.");
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID not found in token.");
 
             var students = await _context.Courses
-                .Where(c => c.StaffId == staffId)
+                .Where(c => c.TeacherId == userId)
                 .Include(c => c.Students)
                 .SelectMany(c => c.Students)
                 .Distinct()
@@ -40,19 +40,18 @@ namespace SchoolManagementAPI.Controllers
         }
 
         // POST: api/teacher/grade
-        [HttpPost("grade")]
+        [HttpPost("grades")]
         public async Task<IActionResult> AssignGrade([FromBody] Grade model)
         {
-            var staffId = User.FindFirst("staffId")?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // Ensure the student belongs to this teacher's course
             var isStudentInCourse = await _context.Courses
-                .AnyAsync(c => c.StaffId == staffId && c.Students.Any(s => s.Id == model.StudentId));
+                .AnyAsync(c => c.TeacherId == userId && c.Students.Any(s => s.Id == model.StudentId));
 
             if (!isStudentInCourse)
                 return Unauthorized("This student is not in your course.");
 
-            model.StaffId = staffId;
+            model.TeacherId = userId;
             _context.Grades.Add(model);
             await _context.SaveChangesAsync();
 
@@ -63,16 +62,16 @@ namespace SchoolManagementAPI.Controllers
         [HttpPost("attendance")]
         public async Task<IActionResult> MarkAttendance([FromBody] Attendance model)
         {
-            var staffId = User.FindFirst("staffId")?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // Ensure student is in teacher’s course
             var isStudentInCourse = await _context.Courses
-                .AnyAsync(c => c.StaffId == staffId && c.Students.Any(s => s.Id == model.StudentId));
+                .AnyAsync(c => c.TeacherId == userId && c.Students.Any(s => s.Id == model.StudentId));
 
             if (!isStudentInCourse)
                 return Unauthorized("You can only mark attendance for your students.");
 
-            model.Date = model.Date.Date; // Optional: normalize date
+            model.Date = model.Date.Date;
+            model.TeacherId = userId;
             _context.Attendances.Add(model);
             await _context.SaveChangesAsync();
 
@@ -80,4 +79,5 @@ namespace SchoolManagementAPI.Controllers
         }
     }
 }
+
 

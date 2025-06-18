@@ -5,13 +5,29 @@ export default function AddStudentForm() {
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = data => {
-    axios.post('http://localhost:5293/api/admin/students', data)
-      .then(() => {
-        alert('Student added!');
+    const token = localStorage.getItem('token'); // Get token from localstorage
+    
+    axios.post('http://localhost:5293/api/admin/add-student', data, {
+      headers: {
+        Authorization: `Bearer ${token}` // Add token in header
+      }
+    })
+
+      .then((response) => {
+        console.log("Response;",response); //shows what came from backend
+        alert(response.data.message ||"Student added!"); //shows backend message if exists
         reset();
       })
-      .catch(err => console.error(err));
-  };
+      .catch(err =>{
+        console.error(err);
+      alert("Error adding student.Please try again later.");
+
+      if (err.response?.status === 401){
+        alert ("Unauthorized! Please login again.");
+      }
+  });
+};
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

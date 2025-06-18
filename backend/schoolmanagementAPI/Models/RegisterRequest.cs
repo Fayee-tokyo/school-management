@@ -23,8 +23,5 @@ namespace SchoolManagementAPI.Models
         public string? Phone { get; set; }
 
         public string? Role { get; set; } = "Student";
-        public string? RegistrationNumber { get; set; } // For Student
-    public string? StaffId { get; set; } // For Teacher/Admin
-    public string? ParentCode { get; set; } // For Parent
     }
 }

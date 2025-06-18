@@ -10,6 +10,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from  './pages/AdminPage';
+
 function App() {
   return (
     <>
