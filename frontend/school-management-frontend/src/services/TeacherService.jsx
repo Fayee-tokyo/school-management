@@ -20,3 +20,12 @@ export const updateTeacher = (id, data) =>
 //delete teacher by 
 export const deleteTeacher = (id) =>
   axios.delete(`${API_BASE}/${id}`, { headers: authHeader() });
+
+ //TeacherService.js
+export const getAllCourses = () =>
+  axios.get('http://localhost:5293/api/admin/courses', { headers: authHeader() });
+
+export const assignCoursesToTeacher = (data) =>
+  axios.post('http://localhost:5293/api/admin/assign-courses', data, {
+    headers: { ...authHeader(), 'Content-Type': 'application/json' },
+  });

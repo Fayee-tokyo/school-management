@@ -4,11 +4,13 @@ import axios from 'axios';
 import { authHeader } from '../services/AuthService';
 import AddTeacherForm from './AddTeacherForm';
 import EditTeacherForm from './EditTeacherForm';
-import styles from './AdminTeacherDashboard.module.css';
+import AssignCoursesForm from './AssignCoursesForm';
+import styles from './AdminDashboard.module.css';
 
 export default function AdminTeacherDashboard() {
   const [teachers, setTeachers] = useState([]);
   const [editingTeacher, setEditingTeacher] = useState(null);
+  const [showAssignForm, setShowAssignForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -55,6 +57,13 @@ export default function AdminTeacherDashboard() {
       <section className={styles.section}>
         <h2 className={styles.heading}>Add Teacher</h2>
         <AddTeacherForm onSuccess={fetchTeachers} />
+
+        <button
+          onClick={() => setShowAssignForm(true)}
+          className={styles.assignBtn}
+        >
+          ➕ Assign Courses to Teacher
+        </button>
       </section>
 
       <section className={styles.section}>
@@ -125,6 +134,16 @@ export default function AdminTeacherDashboard() {
           onClose={() => setEditingTeacher(null)}
           onSuccess={() => {
             setEditingTeacher(null);
+            fetchTeachers();
+          }}
+        />
+      )}
+
+      {showAssignForm && (
+        <AssignCoursesForm
+          onClose={() => setShowAssignForm(false)}
+          onSuccess={() => {
+            setShowAssignForm(false);
             fetchTeachers();
           }}
         />
