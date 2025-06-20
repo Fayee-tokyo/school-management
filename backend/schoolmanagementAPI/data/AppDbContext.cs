@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagementAPI.Models;
@@ -14,6 +15,8 @@ namespace SchoolManagementAPI.Data
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
+        
+        public DbSet<TeacherCourse> TeacherCourses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +35,21 @@ namespace SchoolManagementAPI.Data
                 .HasOne(sc => sc.Course)
                 .WithMany(c => c.StudentCourses)
                 .HasForeignKey(sc => sc.CourseId);
+
+            //configure composite primary key for TeacherCourse
+            modelBuilder.Entity<TeacherCourse>()
+            .HasKey(tc => new { tc.TeacherId, tc.CourseId });
+
+            modelBuilder.Entity<TeacherCourse>()
+            .HasOne(tc => tc.Teacher)
+            .WithMany(t => t.TeacherCourses)
+            .HasForeignKey(tc => tc.TeacherId);
+
+            modelBuilder.Entity<TeacherCourse>()
+            .HasOne(tc=> tc.Course)
+            .WithMany(c => c.TeacherCourses)
+            .HasForeignKey(tc => tc.CourseId);
+
 
             // ✅ Sample Seed Data
 
@@ -63,21 +81,21 @@ namespace SchoolManagementAPI.Data
                 //  );
 
                 // Optional: seed teacher (uncomment if needed and a UserId "1" exists)
-                /*
-                modelBuilder.Entity<Teacher>().HasData(
-                    new Teacher
-                    {
-                        Id = 1,
-                        FullName = "John Doe",
-                        Email = "johndoe@example.com",
-                        PhoneNumber = "0700000000",
-                        Gender = "Male",
-                        Faculty = "Engineering",
-                        Department = "Computer Science",
-                        UserId = "1"
-                    }
-                );
-                */
+
+                //modelBuilder.Entity<Teacher>().HasData(
+                // new Teacher
+                //  {
+                //    Id = 1,
+                //  FullName = "John Doe",
+                //Email = "johndoe@example.com",
+                //PhoneNumber = "0700000000",
+                //Gender = "Male",
+                //Faculty = "Engineering",
+                //Department = "Computer Science",
+                //UserId = "1"
+                // }
+                // );
+
             }
         }
     }

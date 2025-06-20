@@ -5,7 +5,7 @@
 namespace schoolmanagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class StudentCourseInitial : Migration
+    public partial class UpdateTeacherWithUserId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

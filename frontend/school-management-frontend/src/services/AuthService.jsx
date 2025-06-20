@@ -1,7 +1,7 @@
 // src/services/authService.js
 
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 /**
  * Base URL for your backend API auth endpoints
@@ -40,16 +40,13 @@ export async function login(credentials) {
     { headers: { 'Content-Type': 'application/json' } }
   );
 
-  // The backend returns an object like { Token: "<jwt string>" } or { token: ... }
   const token = response.data.token || response.data.Token;
   if (!token) {
     throw new Error('No token returned from server');
   }
 
-  // Save token in localStorage
   localStorage.setItem(TOKEN_KEY, token);
 
-  // Decode it so the caller can read roles/expiry/etc.
   const decoded = jwtDecode(token);
   return { token, decoded };
 }
@@ -93,19 +90,16 @@ export function getUserRole() {
   const decoded = getDecodedToken();
   if (!decoded) return null;
 
-  // If roles are stored as an array:
-  if (Array.isArray(decoded.role)) {
-    return decoded.role[0] || null;
-  }
-
-  // If your backend used the ClaimTypes.Role URI:
   const claimUri = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
   if (decoded[claimUri]) {
     const claimVal = decoded[claimUri];
     return Array.isArray(claimVal) ? claimVal[0] : claimVal;
   }
 
-  // Otherwise, fallback:
+  if (Array.isArray(decoded.role)) {
+    return decoded.role[0] || null;
+  }
+
   return decoded.role || null;
 }
 
@@ -117,19 +111,23 @@ export function getUserRole() {
 export function isLoggedIn() {
   const decoded = getDecodedToken();
   if (!decoded || !decoded.exp) return false;
-  // exp is in seconds since Unix epoch
   return decoded.exp > Date.now() / 1000;
 }
 
 /**
  * Return an authorization header object for protected requests.
- * Example: axios.get('/api/protected', { headers: authHeader() })
- * @returns {{ Authorization: string } | {}}
+ * Adds both Authorization and Content-Type headers.
+ * @returns {{ Authorization: string, 'Content-Type': string }}
  */
 export function authHeader() {
   const token = getToken();
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+
   if (token) {
-    return { Authorization: `Bearer ${token}` };
+    headers.Authorization = `Bearer ${token}`;
   }
-  return {};
+
+  return headers;
 }

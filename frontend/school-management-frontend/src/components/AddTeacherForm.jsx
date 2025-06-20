@@ -1,7 +1,8 @@
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import { authHeader } from '../services/AuthService';
 
-export default function AddTeacherForm() {
+export default function AddTeacherForm({ onSuccess }) {
   const {
     register,
     handleSubmit,
@@ -9,86 +10,106 @@ export default function AddTeacherForm() {
     formState: { errors }
   } = useForm();
 
-  const token = localStorage.getItem('token');
-
   const onSubmit = async (data) => {
     try {
-      await axios.post('http://localhost:5293/api/admin/add-teacher', data, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      await axios.post('http://localhost:5293/api/admin/teachers', data, {
+        headers: authHeader()
       });
-      alert('Teacher added successfully!');
+      alert('✅ Teacher added successfully!');
       reset();
+      if (onSuccess) onSuccess();
     } catch (err) {
-      console.error('Error adding teacher:', err);
+      console.error('❌ Error adding teacher:', err);
       alert('Failed to add teacher.');
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-4 rounded shadow mt-4 max-w-md">
+      {/* Full Name */}
       <div className="mb-3">
-        <label className="block font-medium">First Name</label>
+        <label className="block font-medium">Full Name</label>
         <input
           type="text"
-          {...register('firstName', { required: 'First name is required' })}
+          {...register('fullName', { required: 'Full name is required' })}
           className="w-full border p-2 rounded"
         />
-        {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
+        {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
       </div>
 
-      <div className="mb-3">
-        <label className="block font-medium">Last Name</label>
-        <input
-          type="text"
-          {...register('lastName', { required: 'Last name is required' })}
-          className="w-full border p-2 rounded"
-        />
-        {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
-      </div>
-
+      {/* Email */}
       <div className="mb-3">
         <label className="block font-medium">Email</label>
         <input
           type="email"
-          {...register('email', { required: 'Email is required' })}
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Invalid email format',
+            }
+          })}
           className="w-full border p-2 rounded"
         />
         {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
       </div>
 
+      {/* Phone Number */}
       <div className="mb-3">
-        <label className="block font-medium">Phone</label>
+        <label className="block font-medium">Phone Number</label>
         <input
           type="text"
-          {...register('phoneNumber')}
+          {...register('phoneNumber', {
+            pattern: {
+              value: /^[0-9]{10,15}$/,
+              message: 'Phone number must be 10-15 digits',
+            }
+          })}
           className="w-full border p-2 rounded"
         />
+        {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
       </div>
 
+      {/* Gender */}
       <div className="mb-3">
-        <label className="block font-medium">Staff ID</label>
+        <label className="block font-medium">Gender</label>
+        <select
+          {...register('gender', { required: 'Gender is required' })}
+          className="w-full border p-2 rounded"
+        >
+          <option value="">Select gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        {errors.gender && <p className="text-red-500 text-sm">{errors.gender.message}</p>}
+      </div>
+
+      {/* Faculty */}
+      <div className="mb-3">
+        <label className="block font-medium">Faculty</label>
         <input
           type="text"
-          {...register('staffId', { required: 'Staff ID is required' })}
+          {...register('faculty', { required: 'Faculty is required' })}
           className="w-full border p-2 rounded"
         />
-        {errors.staffId && <p className="text-red-500 text-sm">{errors.staffId.message}</p>}
+        {errors.faculty && <p className="text-red-500 text-sm">{errors.faculty.message}</p>}
       </div>
 
+      {/* Department */}
       <div className="mb-3">
         <label className="block font-medium">Department</label>
         <input
           type="text"
-          {...register('department')}
+          {...register('department', { required: 'Department is required' })}
           className="w-full border p-2 rounded"
         />
+        {errors.department && <p className="text-red-500 text-sm">{errors.department.message}</p>}
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
       >
         Add Teacher
       </button>

@@ -4,6 +4,7 @@ namespace SchoolManagementAPI.DTOs.Teacher
 {
     public class CreateTeacherDto
     {
+
         [Required]
         public string FullName { get; set; }
 
@@ -22,6 +23,6 @@ namespace SchoolManagementAPI.DTOs.Teacher
 
         [Required]
         public string Department { get; set; }
-        public string UserId { get; set; }
+
     }
 }

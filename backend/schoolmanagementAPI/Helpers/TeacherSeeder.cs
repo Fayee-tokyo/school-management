@@ -48,7 +48,8 @@ namespace SchoolManagementAPI.Helpers
                     Gender = "Female",
                     Faculty = "Science",
                     Department = "Mathematics",
-                    UserId = teacherUser.Id
+                    UserId= teacherUser.Id,
+                
                 };
 
                 context.Teachers.Add(teacher);
