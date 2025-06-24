@@ -1,13 +1,14 @@
-// AdminTeacherDashboard.jsx
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { authHeader } from '../services/AuthService';
 import AddTeacherForm from './AddTeacherForm';
 import EditTeacherForm from './EditTeacherForm';
 import AssignCoursesForm from './AssignCoursesForm';
+import AdminCourseDashboard from './AdminCourseDashboard';
 import styles from './AdminDashboard.module.css';
 
-export default function AdminTeacherDashboard() {
+export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState('teachers');
   const [teachers, setTeachers] = useState([]);
   const [editingTeacher, setEditingTeacher] = useState(null);
   const [showAssignForm, setShowAssignForm] = useState(false);
@@ -52,102 +53,128 @@ export default function AdminTeacherDashboard() {
 
   return (
     <div className={styles.wrapper}>
-      <h1 className={styles.title}>Teacher Management</h1>
-
-      <section className={styles.section}>
-        <h2 className={styles.heading}>Add Teacher</h2>
-        <AddTeacherForm onSuccess={fetchTeachers} />
-
+      {/* Tab Buttons */}
+      <div className="mb-6 flex gap-4">
         <button
-          onClick={() => setShowAssignForm(true)}
-          className={styles.assignBtn}
+          className={`px-4 py-2 rounded ${activeTab === 'teachers' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setActiveTab('teachers')}
         >
-          ➕ Assign Courses to Teacher
+          👩‍🏫 Teacher Management
         </button>
-      </section>
+        <button
+          className={`px-4 py-2 rounded ${activeTab === 'courses' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setActiveTab('courses')}
+        >
+          📚 Course Management
+        </button>
+      </div>
 
-      <section className={styles.section}>
-        <h2 className={styles.heading}>Existing Teachers</h2>
+      {/* === Teacher Management Section === */}
+      {activeTab === 'teachers' && (
+        <>
+          <h1 className={styles.title}>Teacher Management</h1>
 
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.searchBox}
-        />
+          <section className={styles.section}>
+            <h2 className={styles.heading}>Add Teacher</h2>
+            <AddTeacherForm onSuccess={fetchTeachers} />
 
-        {loading ? (
-          <div className={styles.message}>Loading teachers...</div>
-        ) : filteredTeachers.length === 0 ? (
-          <div className={styles.message}>No teachers found.</div>
-        ) : (
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              <thead className={styles.tableHead}>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Gender</th>
-                  <th>Faculty</th>
-                  <th>Department</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTeachers.map((t, i) => (
-                  <tr key={t.id} className={i % 2 === 0 ? styles.tableRowAlt : ''}>
-                    <td>{t.fullName}</td>
-                    <td>{t.email}</td>
-                    <td>{t.phoneNumber}</td>
-                    <td>{t.gender}</td>
-                    <td>{t.faculty}</td>
-                    <td>{t.department}</td>
-                    <td className={styles.actions}>
-                      <button
-                        onClick={() => setEditingTeacher(t)}
-                        className={styles.editBtn}
-                        title="Edit"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => handleDelete(t.id)}
-                        className={styles.deleteBtn}
-                        title="Delete"
-                      >
-                        🗑
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+            <button
+              onClick={() => setShowAssignForm(true)}
+              className={styles.assignBtn}
+            >
+              ➕ Assign Courses to Teacher
+            </button>
+          </section>
 
-      {editingTeacher && (
-        <EditTeacherForm
-          teacher={editingTeacher}
-          onClose={() => setEditingTeacher(null)}
-          onSuccess={() => {
-            setEditingTeacher(null);
-            fetchTeachers();
-          }}
-        />
+          <section className={styles.section}>
+            <h2 className={styles.heading}>Existing Teachers</h2>
+
+            <input
+              type="text"
+              placeholder="Search by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchBox}
+            />
+
+            {loading ? (
+              <div className={styles.message}>Loading teachers...</div>
+            ) : filteredTeachers.length === 0 ? (
+              <div className={styles.message}>No teachers found.</div>
+            ) : (
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead className={styles.tableHead}>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Gender</th>
+                      <th>Faculty</th>
+                      <th>Department</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTeachers.map((t, i) => (
+                      <tr key={t.id} className={i % 2 === 0 ? styles.tableRowAlt : ''}>
+                        <td>{t.fullName}</td>
+                        <td>{t.email}</td>
+                        <td>{t.phoneNumber}</td>
+                        <td>{t.gender}</td>
+                        <td>{t.faculty}</td>
+                        <td>{t.department}</td>
+                        <td className={styles.actions}>
+                          <button
+                            onClick={() => setEditingTeacher(t)}
+                            className={styles.editBtn}
+                            title="Edit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(t.id)}
+                            className={styles.deleteBtn}
+                            title="Delete"
+                          >
+                            🗑
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+          {/* Edit Form Modal */}
+          {editingTeacher && (
+            <EditTeacherForm
+              teacher={editingTeacher}
+              onClose={() => setEditingTeacher(null)}
+              onSuccess={() => {
+                setEditingTeacher(null);
+                fetchTeachers();
+              }}
+            />
+          )}
+
+          {/* Assign Courses Modal */}
+          {showAssignForm && (
+            <AssignCoursesForm
+              onClose={() => setShowAssignForm(false)}
+              onSuccess={() => {
+                setShowAssignForm(false);
+                fetchTeachers();
+              }}
+            />
+          )}
+        </>
       )}
 
-      {showAssignForm && (
-        <AssignCoursesForm
-          onClose={() => setShowAssignForm(false)}
-          onSuccess={() => {
-            setShowAssignForm(false);
-            fetchTeachers();
-          }}
-        />
-      )}
+      {/* === Course Management Section === */}
+      {activeTab === 'courses' && <AdminCourseDashboard />}
     </div>
   );
 }

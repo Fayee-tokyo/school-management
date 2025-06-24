@@ -10,6 +10,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from  './pages/AdminPage';
+import TeacherCourses from './components/TeacherCourses';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path ="/login" element ={<Login />} />
         <Route path ="/unauthorized" element={<Unauthorized/>}/>
         <Route path="/admin" element={<AdminPage/>}/>
+        <Route path ="/teacher/courses" element={<TeacherCourses/>}/>
 // In App.jsx or Routes.jsx
 <Route
   path="/admin-dashboard"

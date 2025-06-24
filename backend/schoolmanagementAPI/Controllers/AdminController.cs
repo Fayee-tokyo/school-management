@@ -77,7 +77,7 @@ namespace SchoolManagementAPI.Controllers
                 PhoneNumber = dto.PhoneNumber
             };
 
-            var result = await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user, "Teacher@123");
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
@@ -156,6 +156,55 @@ namespace SchoolManagementAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Courses successfully assigned to teacher." });
+        }
+
+        [HttpPost("courses")]
+        public async Task<IActionResult> AddCourse([FromBody] CreateCourseDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Title))
+                return BadRequest(new { message = "Title is required." });
+            var course = new Courses
+            {
+                Title = dto.Title
+            };
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Course added successfully." });
+
+        }
+
+        [HttpGet("courses")]
+        public async Task<IActionResult> GetAllCourses()
+        {
+            var courses = await _context.Courses.ToListAsync();
+            return Ok(courses);
+        }
+
+        [HttpPut("courses/{id}")]
+        public async Task<IActionResult> UpdateCourse(int id, [FromBody] UpdateCourseDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null)
+                return NotFound(new { message = "Course not found." });
+
+            course.Title = dto.Title;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Course updated successfully." });
+        }
+
+        //GET: api/admin/courses/{id}
+        [HttpGet("courses/{id}")]
+        public async Task<IActionResult> GetCourseById(int id)
+        {
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null)
+                return NotFound(new { message = "Course not found." });
+
+            return Ok(course);
         }
     }
 }

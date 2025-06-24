@@ -77,6 +77,19 @@ namespace SchoolManagementAPI.Controllers
 
             return Ok("Attendance marked.");
         }
+
+        //GET: api/teacher/courses
+        [HttpGet("courses")]
+        public async Task<IActionResult> GetAssignedCourses()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var courses = await _context.Courses
+            .Where(c => c.TeacherId == userId)
+            .ToListAsync();
+
+            return Ok(courses);
+        }
     }
 }
 

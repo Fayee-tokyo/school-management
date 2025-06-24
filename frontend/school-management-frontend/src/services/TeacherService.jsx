@@ -1,31 +1,39 @@
+// services/TeacherService.js
+
 import axios from 'axios';
 import { authHeader } from './AuthService';
 
-const API_BASE = 'http://localhost:5293/api/admin/teachers';
-//get all teachers
+const BASE_URL = 'http://localhost:5293/api';
+const ADMIN_TEACHER_URL = `${BASE_URL}/admin/teachers`;
+const ADMIN_COURSE_URL = `${BASE_URL}/admin/courses`;
+const ASSIGN_COURSE_URL = `${BASE_URL}/admin/assign-courses`;
+const TEACHER_API_URL = `${BASE_URL}/teacher`;
+
+// ✅ ADMIN SIDE - TEACHERS CRUD
 export const getTeachers = () =>
-  axios.get(API_BASE, { headers: authHeader() });
+  axios.get(ADMIN_TEACHER_URL, { headers: authHeader() });
 
-//get teacher by id
-export const getTeachersById = (id) =>
-    axios.get(`${API_BASE}/${id}`, { headers: authHeader() });
-        
-//create a new teacher
+export const getTeacherById = (id) =>
+  axios.get(`${ADMIN_TEACHER_URL}/${id}`, { headers: authHeader() });
+
 export const createTeacher = (data) =>
-  axios.post(API_BASE, data, { headers: authHeader() });
-//update existing teacher
+  axios.post(ADMIN_TEACHER_URL, data, { headers: authHeader() });
+
 export const updateTeacher = (id, data) =>
-  axios.put(`${API_BASE}/${id}`, data, { headers: authHeader() });
+  axios.put(`${ADMIN_TEACHER_URL}/${id}`, data, { headers: authHeader() });
 
-//delete teacher by 
 export const deleteTeacher = (id) =>
-  axios.delete(`${API_BASE}/${id}`, { headers: authHeader() });
+  axios.delete(`${ADMIN_TEACHER_URL}/${id}`, { headers: authHeader() });
 
- //TeacherService.js
+// ✅ ADMIN SIDE - COURSE ASSIGNMENT
 export const getAllCourses = () =>
-  axios.get('http://localhost:5293/api/admin/courses', { headers: authHeader() });
+  axios.get(ADMIN_COURSE_URL, { headers: authHeader() });
 
 export const assignCoursesToTeacher = (data) =>
-  axios.post('http://localhost:5293/api/admin/assign-courses', data, {
+  axios.post(ASSIGN_COURSE_URL, data, {
     headers: { ...authHeader(), 'Content-Type': 'application/json' },
   });
+
+// ✅ TEACHER SIDE - VIEW COURSES
+export const getAssignedCourses = () =>
+  axios.get(`${TEACHER_API_URL}/courses`, { headers: authHeader() });
