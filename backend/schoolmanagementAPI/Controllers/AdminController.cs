@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagementAPI.Data;
 using SchoolManagementAPI.DTOs.Course;
+using SchoolManagementAPI.DTOs.Student;
 using SchoolManagementAPI.DTOs.Teacher;
 using SchoolManagementAPI.Models;
 using System.Security.Claims;
@@ -24,7 +25,6 @@ namespace SchoolManagementAPI.Controllers
             _userManager = userManager;
         }
 
-        // ✅ DEBUG ENDPOINT - GET: api/admin/debug/claims
         [HttpGet("debug/claims")]
         public IActionResult DebugToken()
         {
@@ -40,7 +40,6 @@ namespace SchoolManagementAPI.Controllers
             });
         }
 
-        // ✅ GET: api/admin/teachers
         [HttpGet("teachers")]
         public async Task<IActionResult> GetAllTeachers()
         {
@@ -48,7 +47,6 @@ namespace SchoolManagementAPI.Controllers
             return Ok(teachers);
         }
 
-        // ✅ GET: api/admin/teachers/{id}
         [HttpGet("teachers/{id}")]
         public async Task<IActionResult> GetTeacher(int id)
         {
@@ -57,7 +55,6 @@ namespace SchoolManagementAPI.Controllers
             return Ok(teacher);
         }
 
-        // ✅ POST: api/admin/teachers
         [HttpPost("teachers")]
         public async Task<IActionResult> AddTeacher([FromBody] CreateTeacherDto dto)
         {
@@ -100,7 +97,6 @@ namespace SchoolManagementAPI.Controllers
             return Ok(new { message = "Teacher created successfully." });
         }
 
-        // ✅ PUT: api/admin/teachers/{id}
         [HttpPut("teachers/{id}")]
         public async Task<IActionResult> UpdateTeacher(int id, [FromBody] UpdateTeacherDto dto)
         {
@@ -123,7 +119,6 @@ namespace SchoolManagementAPI.Controllers
             return Ok(new { message = "Teacher updated successfully." });
         }
 
-        // ✅ DELETE: api/admin/teachers/{id}
         [HttpDelete("teachers/{id}")]
         public async Task<IActionResult> DeleteTeacher(int id)
         {
@@ -136,7 +131,6 @@ namespace SchoolManagementAPI.Controllers
             return Ok(new { message = "Teacher deleted successfully." });
         }
 
-        // ✅ POST: api/admin/assign-courses
         [HttpPost("assign-courses")]
         public async Task<IActionResult> AssignCourses([FromBody] AssignCourseDto dto)
         {
@@ -171,7 +165,6 @@ namespace SchoolManagementAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Course added successfully." });
-
         }
 
         [HttpGet("courses")]
@@ -196,7 +189,6 @@ namespace SchoolManagementAPI.Controllers
             return Ok(new { message = "Course updated successfully." });
         }
 
-        //GET: api/admin/courses/{id}
         [HttpGet("courses/{id}")]
         public async Task<IActionResult> GetCourseById(int id)
         {
@@ -205,6 +197,135 @@ namespace SchoolManagementAPI.Controllers
                 return NotFound(new { message = "Course not found." });
 
             return Ok(course);
+        }
+
+        [HttpGet("students")]
+        public async Task<IActionResult> GetAllStudents()
+        {
+            var students = await _context.Students
+                .Select(s => new StudentDto
+                {
+                    Id = s.Id ?? 0,
+                    FullName = s.FullName,
+                    RegistrationNumber = s.RegistrationNumber,
+                    Class = s.Class,
+                    Gender = s.Gender,
+                    Email = s.Email,
+                    PhoneNumber = s.PhoneNumber,
+                    Faculty = s.Faculty,
+                    Department = s.Department,
+                    DateOfBirth = s.DateOfBirth
+                }).ToListAsync();
+
+            return Ok(students);
+        }
+
+        [HttpGet("students/{id}")]
+        public async Task<IActionResult> GetStudentsById(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+                return NotFound();
+
+            var result = new StudentDto
+            {
+                Id = student.Id ?? 0,
+                FullName = student.FullName,
+                RegistrationNumber = student.RegistrationNumber,
+                Class = student.Class,
+                Gender = student.Gender,
+                Email = student.Email,
+                PhoneNumber = student.PhoneNumber,
+                Faculty = student.Faculty,
+                Department = student.Department,
+                DateOfBirth = student.DateOfBirth
+            };
+            return Ok(result);
+        }
+
+        [HttpPost("students")]
+        public async Task<IActionResult> AddStudent([FromBody] CreateStudentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (existingUser != null)
+                return BadRequest(new { message = "A user with this email already exists." });
+
+            var user = new ApplicationUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                PhoneNumber = dto.PhoneNumber,
+            };
+
+            var result = await _userManager.CreateAsync(user, "Student@123");
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            await _userManager.AddToRoleAsync(user, "Student");
+
+            var student = new Student
+            {
+                FullName = dto.FullName,
+                RegistrationNumber = dto.RegistrationNumber,
+                Class = dto.Class,
+                Gender = dto.Gender,
+                Faculty = dto.Faculty,
+                Department = dto.Department,
+                DateOfBirth = dto.DateOfBirth,
+                Email = dto.Email,
+                PhoneNumber = dto.PhoneNumber,
+                UserId = user.Id
+            };
+
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Student added successfully." });
+        }
+
+        [HttpPut("students/{id}")]
+        public async Task<IActionResult> UpdateStudent(int id, [FromBody] UpdateStudentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+                return NotFound();
+
+            student.FullName = dto.FullName;
+            student.RegistrationNumber = dto.RegistrationNumber;
+            student.Class = dto.Class;
+            student.Gender = dto.Gender;
+            student.Email = dto.Email;
+            student.PhoneNumber = dto.PhoneNumber;
+            student.Faculty = dto.Faculty;
+            student.Department = dto.Department;
+            student.DateOfBirth = dto.DateOfBirth;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Student updated successfully." });
+        }
+
+        [HttpDelete("students/{id}")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+                return NotFound();
+
+            var user = await _userManager.FindByIdAsync(student.UserId);
+            if (user != null)
+                await _userManager.DeleteAsync(user);
+
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Student deleted successfully." });
         }
     }
 }

@@ -1,28 +1,42 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { useEffect } from "react";
 import { authHeader } from "../services/AuthService";
 
-export default function AddStudentForm({ onSuccess }) {
+export default function EditStudentForm({ studentId, onClose, onUpdated }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    const loadStudent = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5293/api/admin/students/${studentId}`, {
+          headers: authHeader()
+        });
+        reset(res.data);
+      // eslint-disable-next-line no-unused-vars
+      } catch (err) {
+        alert("Failed to load student info");
+      }
+    };
+    loadStudent();
+  }, [studentId, reset]);
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:5293/api/admin/students", data, {
+      await axios.put(`http://localhost:5293/api/admin/students/${studentId}`, data, {
         headers: authHeader(),
       });
-      alert("Student added successfully");
-      reset();
-      onSuccess(); // refresh list
+      alert("Student updated successfully");
+      onUpdated(); // refresh list
+      onClose();   // close modal
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      console.error("Error adding student", err);
-      alert("Failed to add student");
+      alert("Update failed");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-gray-100 p-4 rounded">
-      <h3 className="text-lg font-semibold mb-2">Add New Student</h3>
-
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <label className="block font-medium">Full Name</label>
         <input
@@ -34,20 +48,6 @@ export default function AddStudentForm({ onSuccess }) {
       </div>
 
       <div>
-  <label className="block font-semibold">Registration Number</label>
-  <input
-    type="text"
-    {...register("registrationNumber", {
-      required: "Registration number is required",
-      minLength: { value: 4, message: "Minimum 4 characters" }
-    })}
-    className="w-full border p-2 rounded"
-  />
-  {errors.registrationNumber && <p className="text-red-600">{errors.registrationNumber.message}</p>}
-</div>
-
-
-      <div>
         <label className="block font-medium">Email</label>
         <input
           type="email"
@@ -56,23 +56,6 @@ export default function AddStudentForm({ onSuccess }) {
         />
         {errors.email && <p className="text-red-600">{errors.email.message}</p>}
       </div>
-
-      <div>
-  <label className="block font-semibold">Phone Number</label>
-  <input
-    type="tel"
-    {...register("phoneNumber", {
-      required: "Phone number is required",
-      pattern: {
-        value: /^[0-9]{10,15}$/,
-        message: "Enter a valid phone number"
-      }
-    })}
-    className="w-full border p-2 rounded"
-  />
-  {errors.phoneNumber && <p className="text-red-600">{errors.phoneNumber.message}</p>}
-</div>
-
 
       <div>
         <label className="block font-medium">Gender</label>
@@ -98,17 +81,6 @@ export default function AddStudentForm({ onSuccess }) {
       </div>
 
       <div>
-  <label className="block font-semibold">Department</label>
-  <input
-    type="text"
-    {...register("department", { required: "Department is required" })}
-    className="w-full border p-2 rounded"
-  />
-  {errors.department && <p className="text-red-600">{errors.department.message}</p>}
-</div>
-
-
-      <div>
         <label className="block font-medium">Class</label>
         <input
           type="text"
@@ -127,9 +99,14 @@ export default function AddStudentForm({ onSuccess }) {
         />
       </div>
 
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-        Add Student
-      </button>
+      <div className="flex gap-2">
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Update
+        </button>
+        <button type="button" onClick={onClose} className="bg-gray-400 text-white px-4 py-2 rounded">
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }

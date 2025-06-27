@@ -11,6 +11,7 @@ import ParentDashboard from './pages/ParentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from  './pages/AdminPage';
 import TeacherCourses from './components/TeacherCourses';
+import AdminStudentDashboard from './components/AdminStudentDashboard';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path ="/unauthorized" element={<Unauthorized/>}/>
         <Route path="/admin" element={<AdminPage/>}/>
         <Route path ="/teacher/courses" element={<TeacherCourses/>}/>
+        <Route path ="/admin/students" element={<AdminStudentDashboard/>}/>
 // In App.jsx or Routes.jsx
 <Route
   path="/admin-dashboard"

@@ -53,15 +53,16 @@ namespace SchoolManagementAPI.Data
 
             // ✅ Sample Seed Data
 
-            modelBuilder.Entity<Student>().HasData(
-                new Student
-                {
-                    Id = 1,
-                    FullName = "Alice Johnson",
-                    RegistrationNumber = "STU001",
-                    Class = "First Year"
-                }
-            );
+           // modelBuilder.Entity<Student>().HasData(
+                //new Student
+                //{
+                  //  Id = 1,
+                   // FullName = "Alice Johnson",
+                   // RegistrationNumber = "STU001",
+                    //Class = "First Year",
+                    
+              //  }
+            //);
 
             modelBuilder.Entity<Courses>().HasData(
                 new Courses

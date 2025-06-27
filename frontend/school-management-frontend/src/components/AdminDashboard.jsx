@@ -5,6 +5,7 @@ import AddTeacherForm from './AddTeacherForm';
 import EditTeacherForm from './EditTeacherForm';
 import AssignCoursesForm from './AssignCoursesForm';
 import AdminCourseDashboard from './AdminCourseDashboard';
+import AdminStudentDashboard from './AdminStudentDashboard';
 import styles from './AdminDashboard.module.css';
 
 export default function AdminDashboard() {
@@ -66,6 +67,12 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab('courses')}
         >
           📚 Course Management
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${activeTab === 'students' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
+          onClick={() => setActiveTab('students')}
+        >
+          🎓 Student Management
         </button>
       </div>
 
@@ -175,6 +182,9 @@ export default function AdminDashboard() {
 
       {/* === Course Management Section === */}
       {activeTab === 'courses' && <AdminCourseDashboard />}
+
+      {/* === Student Management Section === */}
+      {activeTab === 'students' && <AdminStudentDashboard />}
     </div>
   );
 }
