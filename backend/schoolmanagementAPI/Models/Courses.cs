@@ -13,8 +13,9 @@ namespace SchoolManagementAPI.Models
         public ICollection<StudentCourse> StudentCourses { get; set; }
         public string? TeacherId { get; set; }
         public Teacher? Teacher { get; set; }
-        
+
         public ICollection<TeacherCourse> TeacherCourses { get; set; }
+        
     
     }
 }

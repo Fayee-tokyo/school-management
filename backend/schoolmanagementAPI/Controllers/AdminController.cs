@@ -327,5 +327,96 @@ namespace SchoolManagementAPI.Controllers
 
             return Ok(new { message = "Student deleted successfully." });
         }
+
+        [HttpPost("enroll-student")]
+        public async Task<IActionResult> EnrollStudent([FromBody] EnrollStudentDTO dto)
+        {
+            var student = await _context.Students.FindAsync(dto.StudentId);
+            if (student == null)
+                return NotFound("Student not found");
+
+            foreach (var courseId in dto.CourseIds)
+            {
+                bool alreadyEnrolled = await _context.StudentCourses
+                    .AnyAsync(sc => sc.StudentId == dto.StudentId && sc.CourseId == courseId);
+
+                if (!alreadyEnrolled)
+                {
+                    var enrollment = new StudentCourse
+                    {
+                        StudentId = dto.StudentId,
+                        CourseId = courseId
+                    };
+                    _context.StudentCourses.Add(enrollment);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok("Student enrolled successfully.");
+        }
+        [HttpGet("students-dropdown")]
+        public async Task<IActionResult> GetStudentsDropdown()
+        {
+            var students = await _context.Students
+                .Select(s => new { s.Id, s.FullName })
+                .ToListAsync();
+
+            return Ok(students);
+        }
+
+        [HttpGet("courses-dropdown")]
+        public async Task<IActionResult> GetCoursesDropdown()
+        {
+            var courses = await _context.Courses
+                .Select(c => new { c.Id, c.Title })
+                .ToListAsync();
+
+            return Ok(courses);
+        }
+
+        [HttpDelete("students/{studentId}/unenroll/{courseId}")]
+        public async Task<IActionResult> UnenrollStudentFromCourse(int studentId, int courseId)
+        {
+            var enrollment = await _context.StudentCourses
+                .FirstOrDefaultAsync(sc => sc.StudentId == studentId && sc.CourseId == courseId);
+
+            if (enrollment == null)
+                return NotFound("Enrollment not found.");
+
+            _context.StudentCourses.Remove(enrollment);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Student unenrolled from course successfully." });
+        }
+        [HttpGet("enrollments")]
+        public async Task<IActionResult> GetEnrollments()
+        {
+            var enrollments = await _context.Students
+                .Include(s => s.StudentCourses)
+                    .ThenInclude(sc => sc.Course)
+                        .ThenInclude(c => c.Teacher)
+                .Select(s => new
+                {
+                    studentId = s.Id,
+                    fullName = s.FullName,
+                    courses = s.StudentCourses.Select(sc => new
+                    {
+                        courseId = sc.CourseId,
+                        title = sc.Course.Title,
+                        teacherName = sc.Course.Teacher != null
+                            ? sc.Course.Teacher.FullName
+                            : "Unassigned"
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(enrollments);
+        }
+
+
+
+
+
+
     }
 }

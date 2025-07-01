@@ -81,6 +81,16 @@ export default function EditStudentForm({ studentId, onClose, onUpdated }) {
       </div>
 
       <div>
+        <label className="block font-medium">Department</label>
+        <input
+        type="text"
+        {...register("department",{required: "Department is required"})}
+        className="w-full border p-2 rounded"
+        />
+        {errors.department && <p className="text-red-600">{errors.department.message}</p>}
+      </div>
+
+      <div>
         <label className="block font-medium">Class</label>
         <input
           type="text"
