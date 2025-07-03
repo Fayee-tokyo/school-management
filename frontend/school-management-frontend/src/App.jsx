@@ -1,88 +1,97 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+
+// Public pages
 import Home from './pages/Home';
 import About from './pages/About';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
-import AdminDashboard from './components/AdminDashboard';
+
+// Admin pages and layout
+import AdminLayout from './components/AdminLayout';
+import AdminHome from './pages/AdminHome';
+import AdminStudentDashboard from './components/AdminStudentDashboard';
+import AdminDashboard from './components/AdminDashboard'; // Teacher Management page
+import AdminCourseDashboard from './components/AdminCourseDashboard';
+import EnrollStudentForm from './components/EnrollStudentForm';
+
+// ProtectedRoute wrapper
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Role-specific dashboards
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminPage from  './pages/AdminPage';
 import TeacherCourses from './components/TeacherCourses';
-import AdminStudentDashboard from './components/AdminStudentDashboard';
 
 function App() {
   return (
-    <>
-      <main style={{minHeight: '80vh',padding: '2rem'}}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/register" element={<Register/>} />
-        <Route path ="/login" element ={<Login />} />
-        <Route path ="/unauthorized" element={<Unauthorized/>}/>
-        <Route path="/admin" element={<AdminPage/>}/>
-        <Route path ="/teacher/courses" element={<TeacherCourses/>}/>
-        <Route path ="/admin/students" element={<AdminStudentDashboard/>}/>
-// In App.jsx or Routes.jsx
-<Route
-  path="/admin-dashboard"
-  element={
-    localStorage.getItem('token')
-      ? <AdminDashboard />
-      : <Navigate to="/login" />
-  }
-/>
+    <Routes>
 
+      {/* 🌐 Public Routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/*Admin only*/}
-        <Route
-        path ="/admin/dashboard"
+      {/* 🔐 Admin Routes - Protected + Uses Sidebar Layout */}
+      <Route
+        path="/admin"
         element={
           <ProtectedRoute allowedRoles={['Admin']}>
-            <AdminDashboard/>
+            <AdminLayout />
           </ProtectedRoute>
         }
-        />
+      >
+        <Route path="students" element={<AdminStudentDashboard />} />
+        <Route path="teachers" element={<AdminDashboard />} /> {/* Teacher Management */}
+        <Route path="courses" element={<AdminCourseDashboard />} />
+        <Route path="enrollments" element={<EnrollStudentForm/>} />
+      </Route>
 
-          {/* Teacher only */}
-          <Route
-            path="/teacher/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['Teacher']}>
-                <TeacherDashboard />
-              </ProtectedRoute>
-            }
-          />
+      {/* 👨‍🏫 Teacher Routes */}
+      <Route
+        path="/teacher/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['Teacher']}>
+            <TeacherDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/courses"
+        element={
+          <ProtectedRoute allowedRoles={['Teacher']}>
+            <TeacherCourses />
+          </ProtectedRoute>
+        }
+      />
 
-           {/* Student only */}
-          <Route
-            path="/student/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['Student']}>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
+      {/* 🎓 Student Route */}
+      <Route
+        path="/student/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['Student']}>
+            <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-           {/* Parent only */}
-          <Route
-            path="/parent/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['Parent']}>
-                <ParentDashboard />
-              </ProtectedRoute>
-            }
-          />
+      {/* 👪 Parent Route */}
+      <Route
+        path="/parent/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['Parent']}>
+            <ParentDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-          {/* Fallback if no route matched */}
-          <Route path="*" element={<Unauthorized />} />
-         </Routes>
-         </main>
-        </>
+      {/* ❗ Catch-All Route */}
+      <Route path="*" element={<Unauthorized />} />
+    </Routes>
   );
-};
-export default App
+}
 
+export default App;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import EnrolledStudentsList from '../components/EnrolledStudentsList';
 import { authHeader } from '../services/AuthService';
 
 export default function TeacherDashboard() {
@@ -29,16 +30,21 @@ export default function TeacherDashboard() {
       ) : (
         <>
           <p className="mb-4 text-green-700 font-medium">Welcome! Here are your assigned courses:</p>
-          <ul className="list-disc pl-6">
+          <ul className="list-disc pl-6 mb-6">
             {courses.map((course) => (
               <li key={course.id} className="mb-2">
                 {course.title}
               </li>
             ))}
           </ul>
+
+          {/*  Enrolled Students List Section */}
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-3">Enrolled Students</h2>
+            <EnrolledStudentsList />
+          </div>
         </>
       )}
     </div>
   );
 }
- 

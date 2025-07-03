@@ -24,7 +24,7 @@ export default function EnrollStudentForm({ onSuccess }) {
     fetchData();
   }, []);
 
-  // ✅ Reusable function to fetch enrolled courses for selected student
+  //  Reusable function to fetch enrolled courses for selected student
   const refreshSelectedStudentEnrollments = async () => {
     if (!selectedStudent) {
       setEnrolledCourses([]);
@@ -43,7 +43,7 @@ export default function EnrollStudentForm({ onSuccess }) {
     }
   };
 
-  // ✅ Automatically refresh when student selection changes
+  //  Automatically refresh when student selection changes
   useEffect(() => {
     refreshSelectedStudentEnrollments();
   }, [selectedStudent]);
@@ -75,7 +75,7 @@ export default function EnrollStudentForm({ onSuccess }) {
     }
   };
 
-  // ✅ Unenroll student
+  //  Unenroll student
   const handleUnenroll = async (courseId) => {
     if (!window.confirm("Are you sure you want to unenroll this student from the course?")) return;
 

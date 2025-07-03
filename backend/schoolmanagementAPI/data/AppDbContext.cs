@@ -46,22 +46,22 @@ namespace SchoolManagementAPI.Data
             .HasForeignKey(tc => tc.TeacherId);
 
             modelBuilder.Entity<TeacherCourse>()
-            .HasOne(tc=> tc.Course)
+            .HasOne(tc => tc.Course)
             .WithMany(c => c.TeacherCourses)
             .HasForeignKey(tc => tc.CourseId);
 
 
             // ✅ Sample Seed Data
 
-           // modelBuilder.Entity<Student>().HasData(
-                //new Student
-                //{
-                  //  Id = 1,
-                   // FullName = "Alice Johnson",
-                   // RegistrationNumber = "STU001",
-                    //Class = "First Year",
-                    
-              //  }
+            // modelBuilder.Entity<Student>().HasData(
+            //new Student
+            //{
+            //  Id = 1,
+            // FullName = "Alice Johnson",
+            // RegistrationNumber = "STU001",
+            //Class = "First Year",
+
+            //  }
             //);
 
             modelBuilder.Entity<Courses>().HasData(
@@ -73,31 +73,31 @@ namespace SchoolManagementAPI.Data
                 }
             );
 
-            // modelBuilder.Entity<StudentCourse>().HasData(
-            // new StudentCourse
-            {
-                //     StudentId = 1,
-                // CourseId = 1
-                // }
-                //  );
-
+            modelBuilder.Entity<Courses>()
+            .HasOne(c => c.Teacher)
+            .WithMany(t => t.Courses)
+            .HasForeignKey(c => c.TeacherId)
+            .HasPrincipalKey(t=> t.UserId) //link to the UserId in the Teacher table
+            .IsRequired(false) //allow unassigned
+            .OnDelete(DeleteBehavior.SetNull);
+            
                 // Optional: seed teacher (uncomment if needed and a UserId "1" exists)
 
-                //modelBuilder.Entity<Teacher>().HasData(
-                // new Teacher
-                //  {
-                //    Id = 1,
-                //  FullName = "John Doe",
-                //Email = "johndoe@example.com",
-                //PhoneNumber = "0700000000",
-                //Gender = "Male",
-                //Faculty = "Engineering",
-                //Department = "Computer Science",
-                //UserId = "1"
-                // }
-                // );
+            //modelBuilder.Entity<Teacher>().HasData(
+            // new Teacher
+            //  {
+            //    Id = 1,
+            //  FullName = "John Doe",
+            //Email = "johndoe@example.com",
+            //PhoneNumber = "0700000000",
+            //Gender = "Male",
+            //Faculty = "Engineering",
+            //Department = "Computer Science",
+            //UserId = "1"
+            // }
+            // );
 
-            }
+        }
         }
     }
-}
+

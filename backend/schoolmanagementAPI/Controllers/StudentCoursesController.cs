@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagementAPI.Data;
 using SchoolManagementAPI.Models;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SchoolManagementAPI.Controllers
 {
@@ -16,7 +19,7 @@ namespace SchoolManagementAPI.Controllers
             _context = context;
         }
 
-        // ✅ GET: api/studentcourses
+        //  GET: api/studentcourses
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -28,7 +31,7 @@ namespace SchoolManagementAPI.Controllers
             return Ok(data);
         }
 
-        // ✅ POST: api/studentcourses
+        //  POST: api/studentcourses
         [HttpPost]
         public async Task<IActionResult> EnrollStudent([FromBody] StudentCourse model)
         {
@@ -42,6 +45,34 @@ namespace SchoolManagementAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Student enrolled successfully.");
+        }
+
+        //  GET: api/studentcourses/my-courses (for logged-in students)
+        [Authorize(Roles = "Student")]
+        [HttpGet("my-courses")]
+        public async Task<IActionResult> GetMyCourses()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (student == null)
+                return NotFound("Student not found.");
+
+            var courses = await _context.StudentCourses
+                .Where(sc => sc.StudentId == student.Id)
+                .Include(sc => sc.Course)
+                    .ThenInclude(c => c.Teacher) //Include teacher details
+                .Select(sc => new
+                {
+                    sc.Course.Id,
+                    sc.Course.Title,
+                    TeacherName = sc.Course.Teacher != null ? sc.Course.Teacher.FullName : "Unassigned"
+                })
+                .ToListAsync();
+
+            return Ok(courses);
         }
     }
 }

@@ -49,7 +49,7 @@ const Login = () => {
       // Redirect based on role
       switch (role) {
         case 'Admin':
-          window.location.href = '/admin/dashboard';
+          window.location.href = '/admin/';
           break;
         case 'Teacher':
           window.location.href = '/teacher/dashboard';

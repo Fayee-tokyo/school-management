@@ -90,6 +90,39 @@ namespace SchoolManagementAPI.Controllers
 
             return Ok(courses);
         }
+        [HttpGet("enrolled-students")]
+        public async Task<IActionResult> GetEnrolledStudents()
+        {
+            var teacherUserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Identity user id
+
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(t => t.UserId == teacherUserId);
+
+            if (teacher == null)
+                return NotFound("Teacher not found.");
+
+            // Get courses taught by this teacher
+            var courseIds = await _context.Courses
+                .Where(c => c.TeacherId == teacherUserId)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            var enrolledStudents = await _context.StudentCourses
+                .Where(sc => courseIds.Contains(sc.CourseId))
+                .Include(sc => sc.Student)
+                .Include(sc => sc.Course)
+                .Select(sc => new
+                {
+                    StudentId = sc.StudentId,
+                    StudentName = sc.Student.FullName,
+                    CourseTitle = sc.Course.Title,
+                })
+                .ToListAsync();
+
+            return Ok(enrolledStudents);
+        }
+
+
     }
 }
 
