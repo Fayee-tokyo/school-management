@@ -1,11 +1,23 @@
-public class Attendance
+using System;
+
+namespace SchoolManagementAPI.Models
 {
-    public int Id { get; set; }
-    public int StudentId { get; set; }
+    public class Attendance
+    {
+        public int Id { get; set; }
 
+        public string StudentId { get; set; }
+        public Student Student { get; set; }
 
-    public DateTime Date { get; set; }
-    public bool Present { get; set; }
+        public int CourseId { get; set; }
+        public Courses Course { get; set; }
 
-    public string TeacherId { get; set; } // who marked it
+        public int WeekNumber { get; set; }
+
+        public bool IsPresent { get; set; }
+
+        public DateTime DateMarked { get; set; }
+
+        public string MarkedByTeacherId { get; set; }
+    }
 }

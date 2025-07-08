@@ -15,19 +15,22 @@ import AdminDashboard from './components/AdminDashboard'; // Teacher Management 
 import AdminCourseDashboard from './components/AdminCourseDashboard';
 import EnrollStudentForm from './components/EnrollStudentForm';
 
-// ProtectedRoute wrapper
-import ProtectedRoute from './components/ProtectedRoute';
-
-// Role-specific dashboards
+// Teacher layout and pages
+import TeacherSidebarLayout from './pages/TeacherSidebarLayout';
 import TeacherDashboard from './pages/TeacherDashboard';
+import TeacherCourses from './components/TeacherCourses';
+import MarkAttendance from './pages/MarkAttendance';
+
+// Student and Parent pages
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
-import TeacherCourses from './components/TeacherCourses';
+
+// ProtectedRoute wrapper
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <Routes>
-
       {/* 🌐 Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
@@ -35,7 +38,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* 🔐 Admin Routes - Protected + Uses Sidebar Layout */}
+      {/* 🔐 Admin Routes */}
       <Route
         path="/admin"
         element={
@@ -45,28 +48,24 @@ function App() {
         }
       >
         <Route path="students" element={<AdminStudentDashboard />} />
-        <Route path="teachers" element={<AdminDashboard />} /> {/* Teacher Management */}
+        <Route path="teachers" element={<AdminDashboard />} />
         <Route path="courses" element={<AdminCourseDashboard />} />
-        <Route path="enrollments" element={<EnrollStudentForm/>} />
+        <Route path="enrollments" element={<EnrollStudentForm />} />
       </Route>
 
-      {/* 👨‍🏫 Teacher Routes */}
+      {/* 👨‍🏫 Teacher Routes - All wrapped in TeacherSidebarLayout */}
       <Route
-        path="/teacher/dashboard"
+        path="/teacher"
         element={
           <ProtectedRoute allowedRoles={['Teacher']}>
-            <TeacherDashboard />
+            <TeacherSidebarLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/teacher/courses"
-        element={
-          <ProtectedRoute allowedRoles={['Teacher']}>
-            <TeacherCourses />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route path="dashboard" element={<TeacherDashboard />} />
+        <Route path="courses" element={<TeacherCourses />} />
+        <Route path="mark-attendance" element={<MarkAttendance />} />
+      </Route>
 
       {/* 🎓 Student Route */}
       <Route
@@ -88,7 +87,7 @@ function App() {
         }
       />
 
-      {/* ❗ Catch-All Route */}
+      {/* ❗ Catch-All */}
       <Route path="*" element={<Unauthorized />} />
     </Routes>
   );
