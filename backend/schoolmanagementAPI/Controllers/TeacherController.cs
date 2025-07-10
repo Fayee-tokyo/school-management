@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagementAPI.Data;
+using SchoolManagementAPI.DTOs.Attendance;
 using SchoolManagementAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -59,7 +60,7 @@ namespace SchoolManagementAPI.Controllers
                 {
                     StudentId = sc.StudentId,
                     StudentName = sc.Student.FullName,
-                    CourseId=sc.CourseId,
+                    CourseId = sc.CourseId,
                     CourseTitle = sc.Course.Title,
                 })
                 .ToListAsync();
@@ -73,8 +74,9 @@ namespace SchoolManagementAPI.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var isStudentInCourse = await _context.Courses
-                .AnyAsync(c => c.TeacherId == userId && c.Students.Any(s => s.Id == model.StudentId));
+            var isStudentInCourse = await _context.StudentCourses
+                .AnyAsync(sc => sc.StudentId == model.StudentId &&
+                                _context.Courses.Any(c => c.Id == sc.CourseId && c.TeacherId == userId));
 
             if (!isStudentInCourse)
                 return Unauthorized("This student is not in your course.");
@@ -90,6 +92,19 @@ namespace SchoolManagementAPI.Controllers
         [HttpPost("mark-attendance")]
         public async Task<IActionResult> MarkAttendance([FromBody] AttendanceSubmitDTO dto)
         {
+            if (!ModelState.IsValid)
+            {
+                foreach (var key in ModelState.Keys)
+                {
+                    var errors = ModelState[key]?.Errors;
+                    if (errors != null && errors.Count > 0)
+                    {
+                        Console.WriteLine($"❌ {key}: {string.Join(", ", errors.Select(e => e.ErrorMessage))}");
+
+                    }
+                    return BadRequest(ModelState);
+                }
+            }
             var teacherId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var course = await _context.Courses
@@ -102,23 +117,26 @@ namespace SchoolManagementAPI.Controllers
             {
                 var existing = await _context.Attendances.FirstOrDefaultAsync(a =>
                     a.CourseId == dto.CourseId &&
-                    a.StudentId == record.StudentId &&
+                    a.StudentId == int.Parse(record.StudentId) &&
                     a.WeekNumber == dto.WeekNumber);
 
                 if (existing != null)
                 {
                     existing.IsPresent = record.IsPresent;
                     existing.DateMarked = DateTime.UtcNow;
+                
                 }
                 else
                 {
                     var attendance = new Attendance
                     {
                         CourseId = dto.CourseId,
-                        StudentId = record.StudentId,
+                        StudentId = int.Parse(record.StudentId),
                         WeekNumber = dto.WeekNumber,
                         IsPresent = record.IsPresent,
-                        DateMarked = DateTime.UtcNow
+                        DateMarked = DateTime.UtcNow,
+                        MarkedByTeacherId =teacherId
+                    
                     };
                     _context.Attendances.Add(attendance);
                 }
@@ -144,7 +162,7 @@ namespace SchoolManagementAPI.Controllers
                 .Where(a => a.CourseId == courseId && a.WeekNumber == weekNumber)
                 .Select(a => new AttendanceRecordDTO
                 {
-                    StudentId = a.StudentId,
+                    StudentId = a.StudentId.ToString(),
                     IsPresent = a.IsPresent
                 })
                 .ToListAsync();
@@ -167,19 +185,5 @@ namespace SchoolManagementAPI.Controllers
 
             return Ok(students);
         }
-    }
-
-    // ✅ DTOs (should ideally live in /DTOs/Attendance)
-    public class AttendanceSubmitDTO
-    {
-        public int CourseId { get; set; }
-        public int WeekNumber { get; set; }
-        public List<AttendanceRecordDTO> Records { get; set; }
-    }
-
-    public class AttendanceRecordDTO
-    {
-        public string StudentId { get; set; }
-        public bool IsPresent { get; set; }
     }
 }

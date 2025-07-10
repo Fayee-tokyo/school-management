@@ -71,7 +71,7 @@ export default function MarkAttendance() {
     }
 
     const records = students.map((student) => ({
-      studentId: student.studentId,
+      studentId: Number(student.studentId),
       isPresent: attendanceData[student.studentId] ?? true,
     }));
 
@@ -82,9 +82,10 @@ export default function MarkAttendance() {
     };
 
     console.log("📤 Submitting payload:", payload);
+     console.log("📤 Final Payload:", JSON.stringify(payload, null, 2));
 
     axios
-      .post("http://localhost:5293/api/teacher/mark-attendance",{dto:payload}, {
+      .post("http://localhost:5293/api/teacher/mark-attendance", payload, {
         headers: authHeader(),
       })
       .then(() => alert("✅ Attendance submitted successfully"))

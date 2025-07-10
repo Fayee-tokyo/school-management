@@ -3,6 +3,7 @@ using SchoolManagementAPI.Models;
 
 public class Student
 {
+    
     public int? Id { get; set; }
     [Required]
     public string FullName { get; set; }
