@@ -180,3 +180,5 @@ C:\Users\Public\Documents\school\school-management\backend\schoolmanagementAPI\o
 C:\Users\Public\Documents\school\school-management\backend\schoolmanagementAPI\obj\Debug\net9.0\schoolmanagementAPI.pdb
 C:\Users\Public\Documents\school\school-management\backend\schoolmanagementAPI\obj\Debug\net9.0\schoolmanagementAPI.genruntimeconfig.cache
 C:\Users\Public\Documents\school\school-management\backend\schoolmanagementAPI\obj\Debug\net9.0\ref\schoolmanagementAPI.dll
+C:\Users\Public\Documents\school\school-management\backend\schoolmanagementAPI\bin\Debug\net9.0\package-lock.json
+C:\Users\Public\Documents\school\school-management\backend\schoolmanagementAPI\bin\Debug\net9.0\package.json

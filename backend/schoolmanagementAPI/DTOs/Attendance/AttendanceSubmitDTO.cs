@@ -9,7 +9,7 @@ namespace SchoolManagementAPI.DTOs.Attendance
 
     public class AttendanceRecordDTO
     {
-        public string StudentId { get; set; }
+        public int StudentId { get; set; }
         public bool IsPresent { get; set; }
     }
 }

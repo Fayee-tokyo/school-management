@@ -16,8 +16,7 @@ namespace SchoolManagementAPI.Models
 
         public bool IsPresent { get; set; }
 
-        public DateTime DateMarked { get; set; }
+        public DateTime DateRecorded { get; set; } = DateTime.UtcNow;
 
-        public string MarkedByTeacherId { get; set; }
     }
 }

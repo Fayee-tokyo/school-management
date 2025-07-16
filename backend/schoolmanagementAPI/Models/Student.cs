@@ -20,5 +20,6 @@ public class Student
     public string? Department { get; set; }
     public ICollection<Courses> Courses { get; set; } = new List<Courses>();
     public ICollection<Grade> Grades { get; set; } = new List<Grade>();
+    public ICollection<Attendance> Attendances { get; set; }
     public ICollection<StudentCourse> StudentCourses { get; set; }
 }

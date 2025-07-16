@@ -15,7 +15,7 @@ namespace SchoolManagementAPI.Models
         public Teacher? Teacher { get; set; }
 
         public ICollection<TeacherCourse> TeacherCourses { get; set; }
-        
-    
+        public ICollection<Grade> Grades { get; set; } = new List<Grade>();
+        public ICollection<Attendance> Attendances { get; set; }
     }
 }

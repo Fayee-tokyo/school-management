@@ -20,6 +20,7 @@ import TeacherSidebarLayout from './pages/TeacherSidebarLayout';
 import TeacherDashboard from './pages/TeacherDashboard';
 import TeacherCourses from './components/TeacherCourses';
 import MarkAttendance from './pages/MarkAttendance';
+import MarkGrade from './pages/MarkGrade';
 
 // Student and Parent pages
 import StudentDashboard from './pages/StudentDashboard';
@@ -65,6 +66,7 @@ function App() {
         <Route path="dashboard" element={<TeacherDashboard />} />
         <Route path="courses" element={<TeacherCourses />} />
         <Route path="mark-attendance" element={<MarkAttendance />} />
+        <Route path="mark-grade" element={<MarkGrade/>}/>
       </Route>
 
       {/* 🎓 Student Route */}

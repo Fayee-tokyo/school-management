@@ -50,6 +50,38 @@ namespace SchoolManagementAPI.Data
             .WithMany(c => c.TeacherCourses)
             .HasForeignKey(tc => tc.CourseId);
 
+            modelBuilder.Entity<Grade>()
+    .HasKey(g => g.Id);
+
+modelBuilder.Entity<Grade>()
+    .HasOne(g => g.Student)
+    .WithMany(s => s.Grades)
+    .HasForeignKey(g => g.StudentId);
+
+modelBuilder.Entity<Grade>()
+    .HasOne(g => g.Course)
+    .WithMany(c => c.Grades)
+    .HasForeignKey(g => g.CourseId);
+
+modelBuilder.Entity<Grade>()
+    .HasOne(g => g.Teacher)
+    .WithMany()
+    .HasForeignKey(g => g.TeacherId);
+
+    modelBuilder.Entity<Student>()
+        .HasMany(s => s.Attendances)
+        .WithOne(a => a.Student)
+        .HasForeignKey(a => a.StudentId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<Courses>()
+        .HasMany(c => c.Attendances)
+        .WithOne(a => a.Course)
+        .HasForeignKey(a => a.CourseId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+
+
 
             // ✅ Sample Seed Data
 
@@ -64,14 +96,14 @@ namespace SchoolManagementAPI.Data
             //  }
             //);
 
-            modelBuilder.Entity<Courses>().HasData(
-                new Courses
-                {
-                    Id = 1,
-                    Title = "Computer Science 101",
-                    TeacherId = "1" // Make sure a user with Id "1" exists in ASP.NET Identity
-                }
-            );
+           // modelBuilder.Entity<Courses>().HasData(
+             //   new Courses
+               // {
+                 //   Id = 1,
+                   // Title = "Computer Science 101",
+                    //TeacherId = "1" // Make sure a user with Id "1" exists in ASP.NET Identity
+                //}
+            //);
 
             modelBuilder.Entity<Courses>()
             .HasOne(c => c.Teacher)

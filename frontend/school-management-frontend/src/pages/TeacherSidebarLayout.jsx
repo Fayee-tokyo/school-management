@@ -1,3 +1,4 @@
+
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 export default function TeacherSidebarLayout() {
@@ -20,6 +21,9 @@ export default function TeacherSidebarLayout() {
           </Link>
           <Link to="/teacher/mark-attendance" className="block hover:text-yellow-400">
             📅 Mark Attendance
+          </Link>
+          <Link to="/teacher/mark-grade" className="block hover:text-yellow-400">
+            ✏️ Mark Grades
           </Link>
           <Link to="/teacher/courses" className="block hover:text-yellow-400">
             📚 My Courses
