@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { authHeader } from "../services/AuthService";
+import "../styles/MarkGrade.css"; // ✅ import your CSS module
 
 export default function MarkGrade() {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
@@ -9,7 +10,7 @@ export default function MarkGrade() {
   const [students, setStudents] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
 
-  // 1) Load teacher's courses
+  // Load teacher's courses
   useEffect(() => {
     axios
       .get("http://localhost:5293/api/teacher/courses", { headers: authHeader() })
@@ -17,7 +18,7 @@ export default function MarkGrade() {
       .catch(err => console.error("Error loading courses:", err));
   }, []);
 
-  // 2) When course changes, load its students
+  // Load students for selected course
   useEffect(() => {
     if (!selectedCourseId) {
       setStudents([]);
@@ -35,7 +36,7 @@ export default function MarkGrade() {
       .catch(err => console.error("Error loading students:", err));
   }, [selectedCourseId]);
 
-  // 3) Submit grade
+  // Submit grade
   const onSubmit = data => {
     const payload = {
       courseId: parseInt(data.courseId),
@@ -56,48 +57,44 @@ export default function MarkGrade() {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">✏️ Assign / Update Grade</h2>
+    <div className="grade-container">
+      <h2 className="grade-heading">✏️ Assign or Update Student Grade</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Course */}
-        <div>
-          <label className="block mb-1">Course</label>
+      <form onSubmit={handleSubmit(onSubmit)} className="grade-form">
+        {/* Course Selection */}
+        <div className="form-group">
+          <label>Course</label>
           <select
             {...register("courseId", { required: "Course is required" })}
             onChange={e => setSelectedCourseId(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="input-field"
           >
-            <option value="">Select course</option>
+            <option value="">Select a course</option>
             {courses.map(c => (
               <option key={c.id} value={c.id}>{c.title}</option>
             ))}
           </select>
-          {errors.courseId && (
-            <p className="text-red-600 text-sm">{errors.courseId.message}</p>
-          )}
+          {errors.courseId && <p className="error-text">{errors.courseId.message}</p>}
         </div>
 
-        {/* Student */}
-        <div>
-          <label className="block mb-1">Student</label>
+        {/* Student Selection */}
+        <div className="form-group">
+          <label>Student</label>
           <select
             {...register("studentId", { required: "Student is required" })}
-            className="w-full border p-2 rounded"
+            className="input-field"
           >
-            <option value="">Select student</option>
+            <option value="">Select a student</option>
             {students.map(s => (
               <option key={s.studentId} value={s.studentId}>{s.studentName}</option>
             ))}
           </select>
-          {errors.studentId && (
-            <p className="text-red-600 text-sm">{errors.studentId.message}</p>
-          )}
+          {errors.studentId && <p className="error-text">{errors.studentId.message}</p>}
         </div>
 
-        {/* Score */}
-        <div>
-          <label className="block mb-1">Score (0–100)</label>
+        {/* Score Input */}
+        <div className="form-group">
+          <label>Score (0–100)</label>
           <input
             type="number"
             {...register("score", {
@@ -105,18 +102,14 @@ export default function MarkGrade() {
               min: { value: 0, message: "Min is 0" },
               max: { value: 100, message: "Max is 100" }
             })}
-            className="w-full border p-2 rounded"
-            placeholder="Enter score"
+            className="input-field"
+            placeholder="Enter grade score"
           />
-          {errors.score && (
-            <p className="text-red-600 text-sm">{errors.score.message}</p>
-          )}
+          {errors.score && <p className="error-text">{errors.score.message}</p>}
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
-        >
+        {/* Submit */}
+        <button type="submit" className="submit-btn">
           Save Grade
         </button>
       </form>

@@ -6,6 +6,7 @@ using SchoolManagementAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using SchoolManagementAPI.DTOs.Auth;
 
 namespace SchoolManagementAPI.Controllers
 {
@@ -27,7 +28,7 @@ namespace SchoolManagementAPI.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
-            _configuration = configuration; 
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -42,13 +43,18 @@ namespace SchoolManagementAPI.Controllers
                 kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
             );
 
-        return BadRequest(new { Message = "Validation failed", Errors = errors });
+                return BadRequest(new { Message = "Validation failed", Errors = errors });
             }
 
-             // Role validation
-  
+            if (request.Role?.ToLower() == "admin")
+            {
+                return BadRequest(new { Message = "Registration as Admin is not allowed publicly." });
+            }
 
-            var user = new ApplicationUser
+            // Role validation
+
+
+                var user = new ApplicationUser
             {
                 UserName = request.Email,
                 Email = request.Email,
@@ -86,7 +92,38 @@ namespace SchoolManagementAPI.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenService.GenerateJwtToken(user, roles);
 
-            return Ok(new { Token = token });
+            return Ok(new
+            {
+                Token = token,
+                username = user.UserName,
+                email = user.Email,
+                roles,
+                isFirstLogin = user.IsFirstLogin
+            });
         }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+                return NotFound(new { Message = "User not found." });
+
+            if (dto.NewPassword != dto.ConfirmPassword)
+                return BadRequest(new { Message = "Passwords do not match." });
+
+            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+
+            if (!result.Succeeded)
+                return BadRequest(new { Errors = result.Errors });
+
+            // Set first login flag to false
+            user.IsFirstLogin = false;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { Message = "Password changed successfully." });
+        }
+
+
     }
 }

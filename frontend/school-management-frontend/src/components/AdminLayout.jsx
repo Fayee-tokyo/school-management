@@ -13,61 +13,107 @@ export default function AdminLayout() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Top Navigation Bar */}
-      <nav className="bg-white shadow-md px-10 py-4 flex items-center justify-between">
-        {/* Left: Admin Panel title + links */}
-        <div className="flex items-center gap-12">
-          <h1 className="text-2xl font-semibold text-blue-700">Admin Panel</h1>
-          <div className="flex gap-8 text-sm text-gray-700">
-            <Link
-              to="/admin/students"
-              className={`hover:text-blue-700 transition ${
-                isActive('/admin/students') && 'text-blue-700 font-semibold border-b-2 border-blue-700'
-              }`}
-            >
-              Students
-            </Link>
-            <Link
-              to="/admin/teachers"
-              className={`hover:text-blue-700 transition ${
-                isActive('/admin/teachers') && 'text-blue-700 font-semibold border-b-2 border-blue-700'
-              }`}
-            >
-              Teachers
-            </Link>
-            <Link
-              to="/admin/courses"
-              className={`hover:text-blue-700 transition ${
-                isActive('/admin/courses') && 'text-blue-700 font-semibold border-b-2 border-blue-700'
-              }`}
-            >
-              Courses
-            </Link>
-            <Link
-              to="/admin/enrollments"
-              className={`hover:text-blue-700 transition ${
-                isActive('/admin/enrollments') && 'text-blue-700 font-semibold border-b-2 border-blue-700'
-              }`}
-            >
-              Enrollments
-            </Link>
-          </div>
+    <div style={styles.container}>
+      {/* Navigation Bar */}
+      <nav style={styles.nav}>
+        <h1 style={styles.logo}>ADMIN PANEL</h1>
+        <div style={styles.links}>
+          <Link
+            to="/admin/students"
+            style={{
+              ...styles.link,
+              ...(isActive('/admin/students') ? styles.active : {})
+            }}
+          >
+            Students
+          </Link>
+          <Link
+            to="/admin/teachers"
+            style={{
+              ...styles.link,
+              ...(isActive('/admin/teachers') ? styles.active : {})
+            }}
+          >
+            Teachers
+          </Link>
+          <Link
+            to="/admin/courses"
+            style={{
+              ...styles.link,
+              ...(isActive('/admin/courses') ? styles.active : {})
+            }}
+          >
+            Courses
+          </Link>
+          <Link
+            to="/admin/enrollments"
+            style={{
+              ...styles.link,
+              ...(isActive('/admin/enrollments') ? styles.active : {})
+            }}
+          >
+            Enrollments
+          </Link>
+          <button onClick={handleLogout} style={styles.logout}>
+            Logout
+          </button>
         </div>
-
-        {/* Right: Logout */}
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm transition"
-        >
-          Logout
-        </button>
       </nav>
 
       {/* Content Area */}
-      <main className="p-6 flex-1 overflow-y-auto">
+      <main style={styles.main}>
         <Outlet />
       </main>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: '100vh',
+    backgroundColor: '#f4f4f4',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  nav: {
+    background: '#2c3e50',
+    color: 'white',
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '1rem 2rem',
+    alignItems: 'center',
+  },
+  logo: {
+    margin: 0,
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+  },
+  links: {
+    display: 'flex',
+    gap: '1.2rem',
+    alignItems: 'center',
+  },
+  link: {
+    color: 'white',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontSize: '0.95rem',
+  },
+  active: {
+    borderBottom: '2px solid white',
+  },
+  logout: {
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  },
+  main: {
+    padding: '2rem',
+    flex: 1,
+    overflowY: 'auto',
+  },
+};

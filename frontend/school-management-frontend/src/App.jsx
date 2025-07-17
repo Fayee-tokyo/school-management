@@ -6,6 +6,7 @@ import About from './pages/About';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
+import ChangePassword from './pages/ChangePassword';
 
 // Admin pages and layout
 import AdminLayout from './components/AdminLayout';
@@ -26,6 +27,12 @@ import MarkGrade from './pages/MarkGrade';
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 
+// Super Admin layout and pages
+import SuperAdminLayout from './components/SuperAdminLayout'; 
+import SuperAdminDashboard from './pages/SuperAdminDashboard'; 
+import ManageAdmins from './pages/ManageAdmins'; 
+import AddAdminForm from './components/AddAdminForm'; 
+
 // ProtectedRoute wrapper
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -38,6 +45,21 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/change-password" element={<ChangePassword />} />
+
+      {/* 👑 Super Admin Routes */}
+      <Route
+        path="/superadmin"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+            <SuperAdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<SuperAdminDashboard />} />
+        <Route path="admins" element={<ManageAdmins />} />
+        <Route path="add-admin" element={<AddAdminForm />} />
+      </Route>
 
       {/* 🔐 Admin Routes */}
       <Route
@@ -48,13 +70,14 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<AdminHome />} />
         <Route path="students" element={<AdminStudentDashboard />} />
         <Route path="teachers" element={<AdminDashboard />} />
         <Route path="courses" element={<AdminCourseDashboard />} />
         <Route path="enrollments" element={<EnrollStudentForm />} />
       </Route>
 
-      {/* 👨‍🏫 Teacher Routes - All wrapped in TeacherSidebarLayout */}
+      {/* 👨‍🏫 Teacher Routes */}
       <Route
         path="/teacher"
         element={
@@ -66,7 +89,7 @@ function App() {
         <Route path="dashboard" element={<TeacherDashboard />} />
         <Route path="courses" element={<TeacherCourses />} />
         <Route path="mark-attendance" element={<MarkAttendance />} />
-        <Route path="mark-grade" element={<MarkGrade/>}/>
+        <Route path="mark-grade" element={<MarkGrade />} />
       </Route>
 
       {/* 🎓 Student Route */}

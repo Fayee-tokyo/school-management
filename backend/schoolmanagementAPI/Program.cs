@@ -9,6 +9,7 @@ using SchoolManagementAPI.Data;
 using SchoolManagementAPI.Helpers;
 using SchoolManagementAPI.Models;
 using SchoolManagementAPI.Services;
+using SchoolManagementAPI.Helpers.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -142,6 +143,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
     await RoleSeeder.SeedRolesAsync(roleManager);
+    await SuperAdminSeeder.SeedSuperAdminAsync(userManager, roleManager);
     await AdminSeeder.SeedAdminAsync(userManager, roleManager);
     await TeacherSeeder.SeedTeachersAsync(userManager, roleManager, context);
 }

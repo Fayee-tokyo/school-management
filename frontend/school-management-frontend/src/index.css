@@ -1,0 +1,62 @@
+/* src/styles/TeacherDashboard.css */
+
+.teacher-dashboard {
+  padding: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+  background-color: #f7fafc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  color: #003366;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+  color: #555;
+  font-size: 1rem;
+}
+
+.dashboard-section {
+  margin-bottom: 2.5rem;
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-section h2 {
+  font-size: 1.2rem;
+  color: #00509e;
+  margin-bottom: 1rem;
+}
+
+.course-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.course-card {
+  background-color: #e9f3ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #cde1f9;
+  text-align: center;
+  font-weight: 500;
+  color: #003366;
+}
+
+.empty-msg {
+  color: #777;
+  font-style: italic;
+}

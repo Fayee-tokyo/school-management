@@ -1,133 +1,148 @@
-import { useForm } from "react-hook-form";
-import axios from "axios";
-import { authHeader } from "../services/AuthService";
+import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { authHeader } from '../services/AuthService';
 
 export default function AddStudentForm({ onSuccess }) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm();
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:5293/api/admin/students", data, {
+      await axios.post('http://localhost:5293/api/admin/students', data, {
         headers: authHeader(),
       });
-      alert("Student added successfully");
+      alert('✅ Student added successfully!');
       reset();
-      onSuccess(); // refresh list
+      if (onSuccess) onSuccess();
     } catch (err) {
-      console.error("Error adding student", err);
-      alert("Failed to add student");
+      console.error('❌ Error adding student:', err);
+      alert('Failed to add student.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-gray-100 p-4 rounded">
-      <h3 className="text-lg font-semibold mb-2">Add New Student</h3>
-
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      // Changed from max-w-5xl to max-w-full
+      className="bg-white p-6 rounded shadow max-w-full mx-auto space-y-4"
+    >
       <div>
-        <label className="block font-medium">Full Name</label>
         <input
           type="text"
-          {...register("fullName", { required: "Full name is required" })}
-          className="w-full border p-2 rounded"
+          placeholder="Full Name"
+          {...register('fullName', { required: 'Full name is required' })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
         />
-        {errors.fullName && <p className="text-red-600">{errors.fullName.message}</p>}
+        {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
       </div>
 
       <div>
-  <label className="block font-semibold">Registration Number</label>
-  <input
-    type="text"
-    {...register("registrationNumber", {
-      required: "Registration number is required",
-      minLength: { value: 4, message: "Minimum 4 characters" }
-    })}
-    className="w-full border p-2 rounded"
-  />
-  {errors.registrationNumber && <p className="text-red-600">{errors.registrationNumber.message}</p>}
-</div>
-
+        <input
+          type="text"
+          placeholder="Registration Number"
+          {...register('registrationNumber', {
+            required: 'Registration number is required',
+            minLength: { value: 4, message: 'Minimum 4 characters' }
+          })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
+        />
+        {errors.registrationNumber && <p className="text-red-500 text-sm">{errors.registrationNumber.message}</p>}
+      </div>
 
       <div>
-        <label className="block font-medium">Email</label>
         <input
           type="email"
-          {...register("email", { required: "Email is required" })}
-          className="w-full border p-2 rounded"
+          placeholder="Email"
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Invalid email format',
+            }
+          })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
         />
-        {errors.email && <p className="text-red-600">{errors.email.message}</p>}
+        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
       </div>
 
       <div>
-  <label className="block font-semibold">Phone Number</label>
-  <input
-    type="tel"
-    {...register("phoneNumber", {
-      required: "Phone number is required",
-      pattern: {
-        value: /^[0-9]{10,15}$/,
-        message: "Enter a valid phone number"
-      }
-    })}
-    className="w-full border p-2 rounded"
-  />
-  {errors.phoneNumber && <p className="text-red-600">{errors.phoneNumber.message}</p>}
-</div>
-
+        <input
+          type="tel"
+          placeholder="Phone Number"
+          {...register('phoneNumber', {
+            required: 'Phone number is required',
+            pattern: {
+              value: /^[0-9]{10,15}$/,
+              message: 'Phone number must be 10-15 digits',
+            }
+          })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
+        />
+        {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
+      </div>
 
       <div>
-        <label className="block font-medium">Gender</label>
         <select
-          {...register("gender", { required: "Gender is required" })}
-          className="w-full border p-2 rounded"
+          {...register('gender', { required: 'Gender is required' })}
+          className="w-full border border-gray-300 p-2 rounded text-gray-500"
         >
           <option value="">Select Gender</option>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
-        {errors.gender && <p className="text-red-600">{errors.gender.message}</p>}
+        {errors.gender && <p className="text-red-500 text-sm">{errors.gender.message}</p>}
       </div>
 
       <div>
-        <label className="block font-medium">Faculty</label>
         <input
           type="text"
-          {...register("faculty", { required: "Faculty is required" })}
-          className="w-full border p-2 rounded"
+          placeholder="Faculty"
+          {...register('faculty', { required: 'Faculty is required' })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
         />
-        {errors.faculty && <p className="text-red-600">{errors.faculty.message}</p>}
+        {errors.faculty && <p className="text-red-500 text-sm">{errors.faculty.message}</p>}
       </div>
 
       <div>
-  <label className="block font-semibold">Department</label>
-  <input
-    type="text"
-    {...register("department", { required: "Department is required" })}
-    className="w-full border p-2 rounded"
-  />
-  {errors.department && <p className="text-red-600">{errors.department.message}</p>}
-</div>
-
-
-      <div>
-        <label className="block font-medium">Class</label>
         <input
           type="text"
-          {...register("class", { required: "Class is required" })}
-          className="w-full border p-2 rounded"
+          placeholder="Department"
+          {...register('department', { required: 'Department is required' })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
         />
-        {errors.class && <p className="text-red-600">{errors.class.message}</p>}
+        {errors.department && <p className="text-red-500 text-sm">{errors.department.message}</p>}
       </div>
 
       <div>
-        <label className="block font-medium">Date of Birth</label>
+        <input
+          type="text"
+          placeholder="Class"
+          {...register('class', { required: 'Class is required' })}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
+        />
+        {errors.class && <p className="text-red-500 text-sm">{errors.class.message}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="dateOfBirth" className="block text-gray-700 text-sm font-bold mb-1">
+          Date of Birth
+        </label>
         <input
           type="date"
-          {...register("dateOfBirth")}
-          className="w-full border p-2 rounded"
+          id="dateOfBirth"
+          {...register('dateOfBirth')}
+          className="w-full border border-gray-300 p-2 rounded placeholder-gray-500"
         />
       </div>
 
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+      >
         Add Student
       </button>
     </form>

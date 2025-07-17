@@ -1,7 +1,9 @@
-
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import styles from "../styles/TeacherSidebarLayout.module.css"; 
 
 export default function TeacherSidebarLayout() {
+  const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -10,32 +12,34 @@ export default function TeacherSidebarLayout() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className={styles.container}>
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-5 space-y-4">
-        <h2 className="text-xl font-bold mb-6">Teacher Panel</h2>
+      <div className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
+        <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
+          {collapsed ? "☰" : "✕"}
+        </button>
 
-        <nav className="space-y-3">
-          <Link to="/teacher/dashboard" className="block hover:text-yellow-400">
-            🏫 Dashboard
-          </Link>
-          <Link to="/teacher/mark-attendance" className="block hover:text-yellow-400">
-            📅 Mark Attendance
-          </Link>
-          <Link to="/teacher/mark-grade" className="block hover:text-yellow-400">
-            ✏️ Mark Grades
-          </Link>
-          <Link to="/teacher/courses" className="block hover:text-yellow-400">
-            📚 My Courses
-          </Link>
-          <button onClick={handleLogout} className="mt-4 text-red-400 hover:text-red-600">
-            🚪 Logout
+        <div className={styles.menu}>
+          <NavLink to="/teacher/dashboard" className={styles.link}>
+            📊 {collapsed ? "" : "Dashboard"}
+          </NavLink>
+          <NavLink to="/teacher/courses" className={styles.link}>
+            📚 {collapsed ? "" : "My Courses"}
+          </NavLink>
+          <NavLink to="/teacher/mark-attendance" className={styles.link}>
+            📝 {collapsed ? "" : "Mark Attendance"}
+          </NavLink>
+          <NavLink to="/teacher/mark-grade" className={styles.link}>
+            🎓 {collapsed ? "" : "Mark Grades"}
+          </NavLink>
+          <button onClick={handleLogout} className={styles.link}>
+            🚪 {collapsed ? "" : "Logout"}
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-100 p-6 overflow-auto">
+      <div className={styles.content}>
         <Outlet />
       </div>
     </div>

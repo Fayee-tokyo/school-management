@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { authHeader } from '../services/AuthService';
+import '../styles/TeacherCourses.css';
 
 export default function TeacherCourses() {
   const [courses, setCourses] = useState([]);
@@ -25,31 +26,29 @@ export default function TeacherCourses() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-blue-700 mb-4">My Assigned Courses</h1>
+    <div className="teacher-courses-container">
+      <h1 className="section-header">My Assigned Courses</h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <p>Loading courses...</p>
       ) : courses.length === 0 ? (
-        <p className="text-gray-500">No courses assigned.</p>
+        <div className="card-container">
+          <p>You are not assigned to any course yet.</p>
+        </div>
       ) : (
-        <table className="w-full border shadow">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 border">Course Title</th>
-              <th className="p-2 border">Course ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.map((course) => (
-              <tr key={course.id}>
-                <td className="p-2 border">{course.title}</td>
-                <td className="p-2 border">{course.id}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="card-container">
+          <p style={{ color: '#15803d', fontWeight: '500', marginBottom: '1rem' }}>
+            Below is a list of courses assigned to you:
+          </p>
+          {courses.map((course) => (
+            <div key={course.id} className="course-card">
+              <h2 className="course-title">{course.title}</h2>
+              <p className="course-id">Course ID: {course.id}</p>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
 }
+

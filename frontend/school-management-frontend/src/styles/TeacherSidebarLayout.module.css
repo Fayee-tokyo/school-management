@@ -1,0 +1,59 @@
+.container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar {
+  background-color: #01164f; /* Tailwind-like blue-800 */
+  color: white;
+  width: 220px;
+  padding: 20px;
+  transition: width 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.collapsed {
+  width: 60px;
+}
+
+.toggleBtn {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 24px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.link {
+  color: white;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.link:hover,
+.link.active {
+  background-color: #3b82f6; /* Tailwind blue-500 */
+}
+
+.content {
+  flex: 1;
+  padding: 30px;
+  background-color: #f0f4f8;
+  overflow-y: auto;
+}

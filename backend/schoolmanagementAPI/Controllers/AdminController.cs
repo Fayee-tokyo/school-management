@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace SchoolManagementAPI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin ,SuperAdmin")]
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
@@ -71,7 +71,8 @@ namespace SchoolManagementAPI.Controllers
             {
                 UserName = dto.Email,
                 Email = dto.Email,
-                PhoneNumber = dto.PhoneNumber
+                PhoneNumber = dto.PhoneNumber,
+                IsFirstLogin =true
             };
 
             var result = await _userManager.CreateAsync(user, "Teacher@123");
@@ -258,6 +259,7 @@ namespace SchoolManagementAPI.Controllers
                 UserName = dto.Email,
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
+                IsFirstLogin =true
             };
 
             var result = await _userManager.CreateAsync(user, "Student@123");
